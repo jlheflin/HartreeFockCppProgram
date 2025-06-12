@@ -1,6 +1,6 @@
 CC = g++
 CXXFLAGS = "-Wall -g"
-TARGET = classes
+TARGET = program
 SRCS = classes.cpp
 OBJS = $(SRCS:.c=.o)
 
@@ -15,4 +15,4 @@ $(TARGET): $(OBJS)
 	$(CC) $(CXXFLAGS) -c $< -o $@
 
 clean:
-	rm -rf $(OBJS) $(TARGET)
+	rm -f $(OBJS) $(TARGET)
