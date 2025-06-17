@@ -1,5 +1,5 @@
 CC = g++
-CXXFLAGS = "-Wall -g"
+CXXFLAGS = -Wall -g
 TARGET = program
 SRCS = classes.cpp
 OBJS = $(SRCS:.c=.o)

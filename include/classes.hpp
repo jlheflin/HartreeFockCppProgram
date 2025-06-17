@@ -1,3 +1,4 @@
+#pragma once
 #include <cmath>
 #include <iostream>
 #include <string>
@@ -10,7 +11,7 @@ struct primitive_gaussian {
   double alpha = 0;
   double coeff = 0;
   const double pi = M_PI;
-  double A = (2.0 * alpha / pi);
+  double A = pow((2.0 * alpha / pi), 0.75);
   coord_type coords;
 
   primitive_gaussian(double alpha, double coeff, coord_type coords)
@@ -19,20 +20,10 @@ struct primitive_gaussian {
   coord_type coordinates() const { return coords; }
 };
 
-std::ostream &operator<<(std::ostream &os, const primitive_gaussian &pg) {
-  os << "primitive_gaussian(alpha=" << pg.alpha << ", coeff=" << pg.coeff
-     << ", coords={";
-
-  for (const auto &[x, y, z] : pg.coords) {
-    os << "(" << x << ", " << y << ", " << z << ")";
-  }
-  os << "})";
-  return os;
-}
-
 struct atomic_orbital {
   std::vector<primitive_gaussian> primitives;
 
+  atomic_orbital() = default;
   atomic_orbital(std::initializer_list<primitive_gaussian> prims)
       : primitives(prims) {}
 
@@ -45,12 +36,18 @@ struct atomic_orbital {
   }
 };
 
-std::ostream &operator<<(std::ostream &os, const atomic_orbital &ao) {
-  for (const auto &pg : ao.primitives) {
-    os << pg << std::endl;
-  }
-  return os;
-}
+struct orbital_set {
+  std::vector<atomic_orbital> aobs;
+
+  orbital_set() = default;
+  orbital_set(std::initializer_list<atomic_orbital> aos) : aobs(aos) {}
+
+  void push_back(const atomic_orbital &ao) { aobs.push_back(ao); }
+
+  size_t size() const { return aobs.size(); }
+
+  const atomic_orbital &operator[](size_t index) const { return aobs[index]; }
+};
 
 struct atom {
   std::string symbol;
@@ -62,15 +59,6 @@ struct atom {
   atom(std::string symbol, int Z, double x, double y, double z)
       : symbol(symbol), Z(Z), x(x), y(y), z(z) {}
 };
-
-std::ostream &operator<<(std::ostream &os, const atom &atm) {
-  os << "Symbol: " << atm.symbol << "\n";
-  os << "Z: " << atm.Z << "\n";
-  os << "x: " << atm.x << "\n";
-  os << "y: " << atm.y << "\n";
-  os << "z: " << atm.z << "\n";
-  return os;
-}
 
 struct molecule {
   std::vector<atom> atoms;
@@ -84,20 +72,21 @@ struct molecule {
   const atom &operator[](size_t index) const { return atoms[index]; }
 };
 
-std::ostream &operator<<(std::ostream &os, const molecule &mol) {
-  for (const auto &atm : mol.atoms) {
-    os << atm.symbol << " " << atm.x << " " << atm.y << " " << atm.z << "\n";
-  }
-  return os;
-}
+struct molecular_system {
+  using mol_type = std::tuple<molecule, orbital_set>;
+  std::vector<mol_type> mol_sys;
 
-int main() {
+  molecular_system() = default;
+  molecular_system(std::initializer_list<mol_type> mol_ao) : mol_sys(mol_ao) {}
 
-  atom h1("H", 1, 0.00234235, 0, 0);
-  atom h2("H", 1, 0, 0, 1);
+  void push_back(const mol_type &mols) { mol_sys.push_back(mols); }
 
-  molecule mol({h1, h2});
-  mol.push_back(h1);
-  std::cout << mol[0] << std::endl;
-  std::cout << mol << std::endl;
-}
+  size_t size() const { return mol_sys.size(); }
+
+  const mol_type &operator[](size_t index) const { return mol_sys[index]; }
+};
+
+std::ostream &operator<<(std::ostream &os, const primitive_gaussian &pg);
+std::ostream &operator<<(std::ostream &os, const atomic_orbital &ao);
+std::ostream &operator<<(std::ostream &os, const atom &atm);
+std::ostream &operator<<(std::ostream &os, const molecule &mol);
