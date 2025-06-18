@@ -34,7 +34,7 @@ int main() {
   auto scf_parameters = std::make_tuple(1e-5, 20);
 
   auto electronic_energy = scf_cycle(molecular_terms, scf_parameters, mol);
-  // auto total_energy = electronic_energy + E_NN;
+  auto total_energy = electronic_energy + E_NN;
 
   // std::cout << "Overlap Matrix:\n";
   // print_2d_matrix(S);
@@ -45,9 +45,9 @@ int main() {
   // std::cout << "V_ee Matrix:\n";
   // print_tensor4d(V_ee);
   // std::cout << "E_NN Value: " << E_NN << std::endl;
-  std::cout << "Electronic energy: " << electronic_energy << std::endl;
-  // std::cout << "Total energy:\n";
-  // std::cout << total_energy << std::endl;
+  // std::cout << "Electronic energy: " << electronic_energy << std::endl;
+  std::cout << std::setprecision(16) << "Total energy: " << total_energy
+            << std::endl;
 
   return 0;
 }
