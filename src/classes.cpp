@@ -3,12 +3,7 @@
 
 std::ostream &operator<<(std::ostream &os, const primitive_gaussian &pg) {
   os << "primitive_gaussian(alpha=" << pg.alpha << ", coeff=" << pg.coeff
-     << ", coords={";
-
-  for (const auto &[x, y, z] : pg.coords) {
-    os << "(" << x << ", " << y << ", " << z << ")";
-  }
-  os << "})";
+     << "}";
   return os;
 }
 
@@ -28,9 +23,9 @@ std::ostream &operator<<(std::ostream &os, const atom &atm) {
   return os;
 }
 
-std::ostream &operator<<(std::ostream &os, const molecule &mol) {
-  for (const auto &atm : mol.atoms) {
-    os << atm.symbol << " " << atm.x << " " << atm.y << " " << atm.z << "\n";
-  }
-  return os;
-}
+// std::ostream &operator<<(std::ostream &os, const molecule &mol) {
+//   for (const auto &atm : mol.aos) {
+//     os << atm.symbol << " " << atm.x << " " << atm.y << " " << atm.z << "\n";
+//   }
+//   return os;
+// }

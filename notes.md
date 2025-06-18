@@ -6,6 +6,7 @@
   - class
   - The l1, l2, l3 variables are not used in this case
   - in the code the main variables are H1_pg1a, H1_pg1b, H1_pg1c
+  - Instance A = ( 2.0 * alpha / math.pi ) ^ 0.75
 
 - zlist = \[Z1, Z2\]
   - Just a list of the atomic numbers of the atoms involved in the system
@@ -28,6 +29,35 @@
         - primitive gaussians, which have
           - alphas, coeffs, coords, and l1, l2, l3
 
-## Containers
+## Functions
 
-f
+### overlap(molecule)
+- Input: molecule
+- Output: an N x N matrix, where N is the number of atomic orbtials
+  - N is determined by nbasis, which is allocated via len(molecule)
+
+```python
+for i in range(nbasis):
+  for j in range(nbasis):
+    # Accesses the atomic orbital, returning the number of primitive gaussians associated with orbital
+    nprimitives_i = len(molecule[i])
+    nprimitives_j = len(molecule[j])
+
+    for k in range(nprimitives_i):
+      for l in range(nprimitives_j):
+      # Loops over all of the primitives
+        N = molecule[i][k].A * molecule[j][l].A
+        p = molecule[i][k].alpha + molecule[j][l].alpha
+        q = molecule[i][k].alpha * molecule[j][l].alpha / p
+        Q = molecule[i][k].coordinates - molecule[j][l].coordinates
+        Q2 = np.dot(Q,Q)
+
+        S[i,j] += N * molecule[i][k].coeff * molecule[j][l].coeff * math.exp(-q*Q2) * (math.pi/p) ^ (3/2)
+```
+
+### kinetic(molecule)
+- Input: molecule
+- Output: an N x N matrix
+
+```python
+```

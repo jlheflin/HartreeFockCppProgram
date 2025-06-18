@@ -1,6 +1,31 @@
 #include <classes.hpp>
 #include <functions.hpp>
+#include <iomanip>
 #include <iostream>
+
+void print_2d_matrix(std::vector<std::vector<double>> mat) {
+  for (auto row : mat) {
+    for (auto num : row) {
+      std::cout << std::setw(10) << std::setprecision(6) << std::fixed << num
+                << " ";
+    }
+    std::cout << "\n";
+  }
+}
+
+void print_tensor4d(tensor4d tensor) {
+  for (auto set1 : tensor) {
+    for (auto set2 : set1) {
+      for (auto set3 : set2) {
+        for (auto num : set3) {
+          std::cout << std::setw(10) << std::setprecision(6) << std::fixed
+                    << num << " ";
+        }
+      }
+      std::cout << "\n";
+    }
+  }
+}
 
 int main() {
 
@@ -9,46 +34,48 @@ int main() {
   auto sto_3g_h_basis_coeff =
       std::vector{0.1543289673E+00, 0.5353281423E+00, 0.4446345422E+00};
 
-  atom h1("H", 1, 0, 0, 0);
-  atom h2("H", 1, 0, 0, 1);
-
-  molecule mol({h1, h2});
-  mol.push_back(h1);
-  std::cout << mol[0] << std::endl;
-  std::cout << mol << std::endl;
-
   atomic_orbital h1_s, h2_s;
 
   for (int i = 0; i < 3; i++) {
     auto pg_1 =
-        primitive_gaussian(sto_3g_h_basis_alpha[i], sto_3g_h_basis_coeff[i],
-                           std::vector{std::make_tuple(h1.x, h1.y, h1.z)});
+        primitive_gaussian(sto_3g_h_basis_alpha[i], sto_3g_h_basis_coeff[i]);
     auto pg_2 =
-        primitive_gaussian(sto_3g_h_basis_alpha[i], sto_3g_h_basis_coeff[i],
-                           std::vector{std::make_tuple(h2.x, h2.y, h2.z)});
+        primitive_gaussian(sto_3g_h_basis_alpha[i], sto_3g_h_basis_coeff[i]);
     h1_s.push_back(pg_1);
     h2_s.push_back(pg_2);
   }
+  h1_s.coords = {0., 0., 0.};
+  h2_s.coords = {0., 0., 1.};
 
-  molecular_system h2_sys;
-  orbital_set h2_aobs;
+  molecule mol = {h1_s, h2_s};
+  mol.Z_list = {1, 1};
+  mol.coord_list = {h1_s.coords, h2_s.coords};
 
-  h2_aobs.push_back(h1_s);
-  h2_aobs.push_back(h2_s);
+  auto S = overlap(mol);
+  auto T = kinetic(mol);
+  auto V_ne = electron_nuclear_attraction(mol, mol.Z_list);
+  auto V_ee = electron_electron_repulsion(mol);
+  auto E_NN = nuclear_nuclear_repulsion_energy(mol.coord_list, mol.Z_list);
+  auto molecular_terms = std::make_tuple(S, T, V_ne, V_ee);
+  auto scf_parameters = std::make_tuple(1e-5, 20);
 
-  h2_sys.push_back(std::make_tuple(mol, h2_aobs));
+  auto electronic_energy = scf_cycle(molecular_terms, scf_parameters, mol);
+  auto total_energy = electronic_energy + E_NN;
 
-  std::cout << "Running overlap" << std::endl;
-  auto overlap_matrix = overlap(h2_aobs);
-  std::cout << "Overlap done" << std::endl;
+  std::cout << "Overlap Matrix:\n";
+  print_2d_matrix(S);
+  std::cout << "Kinetic Matrix:\n";
+  print_2d_matrix(T);
+  std::cout << "V_ne Matrix:\n";
+  print_2d_matrix(V_ne);
+  std::cout << "V_ee Matrix:\n";
+  print_tensor4d(V_ee);
+  std::cout << "E_NN Value:\n";
+  std::cout << E_NN << std::endl;
+  std::cout << "Electronic energy:\n";
+  std::cout << electronic_energy << std::endl;
+  std::cout << "Total energy:\n";
+  std::cout << total_energy << std::endl;
 
-  for (int i = 0; i < overlap_matrix.size(); i++) {
-    for (int j = 0; j < overlap_matrix.size(); j++) {
-      std::cout << overlap_matrix[i][j] << " ";
-    }
-    std::cout << "\n";
-  }
-  std::cout << overlap_matrix[0][0] << std::endl;
-  std::cout << h1_s << std::endl;
-  std::cout << h2_s << std::endl;
+  return 0;
 }
