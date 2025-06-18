@@ -3,6 +3,7 @@
 #include <classes.hpp>
 #include <eigen3/Eigen/Dense>
 #include <eigen3/unsupported/Eigen/MatrixFunctions>
+#include <format>
 
 using tensor4d = std::vector<std::vector<std::vector<std::vector<double>>>>;
 using matrix2d = std::vector<std::vector<double>>;
@@ -105,51 +106,30 @@ std::vector<std::vector<double>> kinetic(molecule mol) {
       for (int k = 0; k < nprimitives_i; k++) {
         for (int l = 0; l < nprimitives_j; l++) {
           auto N = mol[i][k].A * mol[j][l].A;
-          std::cout << "N: " << N << std::endl;
           auto cacb = mol[i][k].coeff * mol[j][l].coeff;
-          std::cout << "cacb: " << cacb << std::endl;
 
           auto p = mol[i][k].alpha + mol[j][l].alpha;
-          std::cout << "p: " << p << std::endl;
           auto P =
               mol[i][k].alpha * mol[i].coords + mol[j][l].alpha * mol[j].coords;
-          std::cout << "P: " << P.x << " " << P.y << " " << P.z << " "
-                    << std::endl;
           auto Pp = P / p;
-          std::cout << "Pp: " << Pp.x << " " << Pp.y << " " << Pp.z << " "
-                    << std::endl;
           auto PG = Pp - mol[j].coords;
-          std::cout << "PG: " << PG.x << " " << PG.y << " " << PG.z << " "
-                    << std::endl;
           auto PGx2 = PG.x * PG.x;
-          std::cout << "PGx2: " << PGx2 << std::endl;
           auto PGy2 = PG.y * PG.y;
-          std::cout << "PGy2: " << PGy2 << std::endl;
           auto PGz2 = PG.z * PG.z;
-          std::cout << "PGz2: " << PGz2 << std::endl;
 
           auto q = (mol[i][k].alpha * mol[j][l].alpha) / p;
-          std::cout << "q: " << q << std::endl;
           auto Q = mol[i].coords - mol[j].coords;
-          std::cout << "Q: " << Q.x << " " << Q.y << " " << Q.z << " "
-                    << std::endl;
           auto Q2 = dot(Q, Q);
-          std::cout << "Q2: " << Q2 << std::endl;
 
           auto s = std::exp(-q * Q2) * pow((M_PI / p), 1.5) * N * cacb;
-          std::cout << "s: " << s << std::endl;
 
           T[i][j] += 3.0 * mol[j][l].alpha * s;
-          std::cout << "T[i][j]: " << T[i][j] << std::endl;
           T[i][j] -=
               2.0 * mol[j][l].alpha * mol[j][l].alpha * s * (PGx2 + 0.5 / p);
-          std::cout << "T[i][j]: " << T[i][j] << std::endl;
           T[i][j] -=
               2.0 * mol[j][l].alpha * mol[j][l].alpha * s * (PGy2 + 0.5 / p);
-          std::cout << "T[i][j]: " << T[i][j] << std::endl;
           T[i][j] -=
               2.0 * mol[j][l].alpha * mol[j][l].alpha * s * (PGz2 + 0.5 / p);
-          std::cout << "Final T[i][j]: " << T[i][j] << std::endl;
         }
       }
     }
@@ -162,7 +142,7 @@ double boys(double x, int n) {
     return 1.0 / (2 * n + 1);
   } else {
     return boost::math::gamma_p(n + 0.5, x) * boost::math::tgamma(n + 0.5) *
-           (1.0 / (std::pow(2 * x, (n + 0.5))));
+           (1.0 / (2 * pow(x, (n + 0.5))));
   }
 }
 
@@ -284,8 +264,8 @@ tensor4d electron_electron_repulsion(molecule mol) {
                   auto term3 = std::exp(-qij * Q2ij);
                   auto term4 = std::exp(-qkl * Q2kl);
 
-                  V_ee[i][j][k][l] += N * term1 * term2 * term3 * term4 *
-                                      boys(PpijPpkl2 / denom, 0);
+                  V_ee[i][j][k][l] += N * cicjckcl * term1 * term2 * term3 *
+                                      term4 * boys(PpijPpkl2 / denom, 0);
                 }
               }
             }

@@ -27,8 +27,8 @@ int main() {
 
   auto S = overlap(mol);
   auto T = kinetic(mol);
-  // auto V_ne = electron_nuclear_attraction(mol, mol.Z_list);
-  // auto V_ee = electron_electron_repulsion(mol);
+  auto V_ne = electron_nuclear_attraction(mol, mol.Z_list);
+  auto V_ee = electron_electron_repulsion(mol);
   // auto E_NN = nuclear_nuclear_repulsion_energy(mol.coord_list, mol.Z_list);
   // auto molecular_terms = std::make_tuple(S, T, V_ne, V_ee);
   // auto scf_parameters = std::make_tuple(1e-5, 20);
@@ -38,12 +38,12 @@ int main() {
 
   // std::cout << "Overlap Matrix:\n";
   // print_2d_matrix(S);
-  std::cout << "Kinetic Matrix:\n";
-  print_2d_matrix(T);
+  // std::cout << "Kinetic Matrix:\n";
+  // print_2d_matrix(T);
   // std::cout << "V_ne Matrix:\n";
   // print_2d_matrix(V_ne);
-  // std::cout << "V_ee Matrix:\n";
-  // print_tensor4d(V_ee);
+  std::cout << "V_ee Matrix:\n";
+  print_tensor4d(V_ee);
   // std::cout << "E_NN Value:\n";
   // std::cout << E_NN << std::endl;
   // std::cout << "Electronic energy:\n";
