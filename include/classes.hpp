@@ -47,6 +47,9 @@ struct orbital_set {
   size_t size() const { return aobs.size(); }
 
   const atomic_orbital &operator[](size_t index) const { return aobs[index]; }
+
+  auto begin() const { return aobs.begin(); }
+  auto end() const { return aobs.end(); }
 };
 
 struct atom {

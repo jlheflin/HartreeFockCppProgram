@@ -38,7 +38,9 @@ int main() {
 
   h2_sys.push_back(std::make_tuple(mol, h2_aobs));
 
+  std::cout << "Running overlap" << std::endl;
   auto overlap_matrix = overlap(h2_aobs);
+  std::cout << "Overlap done" << std::endl;
 
   for (int i = 0; i < overlap_matrix.size(); i++) {
     for (int j = 0; j < overlap_matrix.size(); j++) {
