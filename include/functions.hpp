@@ -1,8 +1,33 @@
 #pragma once
 #include <classes.hpp>
+#include <iomanip>
 
 using tensor4d = std::vector<std::vector<std::vector<std::vector<double>>>>;
 using matrix2d = std::vector<std::vector<double>>;
+
+inline void print_2d_matrix(std::vector<std::vector<double>> mat) {
+  for (auto row : mat) {
+    for (auto num : row) {
+      std::cout << std::setw(10) << std::setprecision(6) << std::fixed << num
+                << " ";
+    }
+    std::cout << "\n";
+  }
+}
+
+inline void print_tensor4d(tensor4d tensor) {
+  for (auto set1 : tensor) {
+    for (auto set2 : set1) {
+      for (auto set3 : set2) {
+        for (auto num : set3) {
+          std::cout << std::setw(10) << std::setprecision(6) << std::fixed
+                    << num << " ";
+        }
+      }
+      std::cout << "\n";
+    }
+  }
+}
 
 std::vector<std::vector<double>> overlap(molecule mol);
 std::vector<std::vector<double>> kinetic(molecule mol);
