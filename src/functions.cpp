@@ -1,9 +1,9 @@
+#include "functions.hpp"
 #include <algorithm>
 #include <boost/math/special_functions/gamma.hpp>
 #include <classes.hpp>
 #include <eigen3/Eigen/Dense>
 #include <eigen3/unsupported/Eigen/MatrixFunctions>
-#include <format>
 
 using tensor4d = std::vector<std::vector<std::vector<std::vector<double>>>>;
 using matrix2d = std::vector<std::vector<double>>;
@@ -368,6 +368,7 @@ double compute_electronic_energy_expectation_value(matrix2d dens_mat,
 double
 scf_cycle(std::tuple<matrix2d, matrix2d, matrix2d, tensor4d> molecular_terms,
           std::tuple<double, int> scf_parameters, molecule mol) {
+  std::cout << "Starting SCF Cycle" << std::endl;
   auto [S, T, Vne, Vee] = molecular_terms;
   auto [tolerance, max_iter] = scf_parameters;
   auto electronic_energy = 0.0;
@@ -377,20 +378,35 @@ scf_cycle(std::tuple<matrix2d, matrix2d, matrix2d, tensor4d> molecular_terms,
   matrix2d dens_mat(nbasis_functions,
                     std::vector<double>(nbasis_functions, 0.0));
 
+  std::cout << "Density Matrix: \n" << std::endl;
   for (int scf_step = 0; scf_step < max_iter; scf_step++) {
+    std::cout << "Iteration: " << scf_step << std::endl;
     auto electronic_energy_old = electronic_energy;
-
+    std::cout << "Old Electronic Energy: " << electronic_energy_old
+              << std::endl;
     auto G = compute_G(dens_mat, Vee);
-
+    std::cout << "G: \n";
+    print_2d_matrix(G);
     auto F = add_matrices(add_matrices(T, Vne), G);
+    std::cout << "F: \n";
+    print_2d_matrix(F);
 
     auto S_eigen = to_eigen(S);
+    std::cout << "S_eigen: \n";
+    std::cout << S_eigen << std::endl;
     auto S_eigen_inv = S_eigen.inverse();
+    std::cout << "S_eigen_inv: \n" << S_eigen_inv << std::endl;
     auto S_eigen_inv_sqrt = S_eigen_inv.sqrt();
+    std::cout << "S_eigen_inv_sqrt: \n" << S_eigen_inv_sqrt << std::endl;
     auto S_inv_sqrt = from_eigen(S_eigen_inv_sqrt);
+    std::cout << "S_inv_sqrt: \n";
+    print_2d_matrix(S_inv_sqrt);
 
     auto F_unitS = mult_matrices(S_inv_sqrt, mult_matrices(F, S_inv_sqrt));
+    std::cout << "F_unitS: \n";
+    print_2d_matrix(F_unitS);
     auto F_unitS_eigen = to_eigen(F_unitS);
+    std::cout << "F_unitS_eigen: \n" << F_unitS_eigen << std::endl;
 
     Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> solver(F_unitS_eigen);
 
@@ -400,14 +416,23 @@ scf_cycle(std::tuple<matrix2d, matrix2d, matrix2d, tensor4d> molecular_terms,
 
     Eigen::VectorXd eigenvalues = solver.eigenvalues();
     Eigen::MatrixXd eigenvectors = solver.eigenvectors();
+    std::cout << "Eigenvalues: \n" << eigenvalues << std::endl;
+    std::cout << "Eigenvectors: \n" << eigenvectors << std::endl;
 
     auto mos = mult_matrices(S_inv_sqrt, from_eigen(eigenvectors));
-    auto density_matrix = compute_density_matrix(mos, 1);
-    electronic_energy =
-        compute_electronic_energy_expectation_value(density_matrix, T, Vne, G);
+    std::cout << "MOS: \n";
+    print_2d_matrix(mos);
 
-    std::cout << "Iteration: " << scf_step
-              << " , Electronic energy: " << electronic_energy << std::endl;
+    dens_mat = compute_density_matrix(mos, 1);
+    std::cout << "New Density Matri: \n";
+    print_2d_matrix(dens_mat);
+
+    electronic_energy =
+        compute_electronic_energy_expectation_value(dens_mat, T, Vne, G);
+    std::cout << "Electronic Energy: " << electronic_energy << std::endl;
+
+    std::cout << "dE: " << electronic_energy - electronic_energy_old
+              << std::endl;
 
     if (std::fabs(electronic_energy - electronic_energy_old) < tolerance) {
       break;
