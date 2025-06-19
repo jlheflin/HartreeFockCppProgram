@@ -13,19 +13,3 @@ std::ostream &operator<<(std::ostream &os, const atomic_orbital &ao) {
   }
   return os;
 }
-
-std::ostream &operator<<(std::ostream &os, const atom &atm) {
-  os << "Symbol: " << atm.symbol << "\n";
-  os << "Z: " << atm.Z << "\n";
-  os << "x: " << atm.x << "\n";
-  os << "y: " << atm.y << "\n";
-  os << "z: " << atm.z << "\n";
-  return os;
-}
-
-// std::ostream &operator<<(std::ostream &os, const molecule &mol) {
-//   for (const auto &atm : mol.aos) {
-//     os << atm.symbol << " " << atm.x << " " << atm.y << " " << atm.z << "\n";
-//   }
-//   return os;
-// }

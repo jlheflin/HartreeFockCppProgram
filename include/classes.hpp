@@ -1,7 +1,6 @@
 #pragma once
 #include <cmath>
 #include <iostream>
-#include <string>
 #include <vector>
 
 struct coord_type {
@@ -52,33 +51,6 @@ struct atomic_orbital {
   }
 };
 
-struct orbital_set {
-  std::vector<atomic_orbital> aobs;
-
-  orbital_set() = default;
-  orbital_set(std::initializer_list<atomic_orbital> aos) : aobs(aos) {}
-
-  void push_back(const atomic_orbital &ao) { aobs.push_back(ao); }
-
-  size_t size() const { return aobs.size(); }
-
-  const atomic_orbital &operator[](size_t index) const { return aobs[index]; }
-
-  auto begin() const { return aobs.begin(); }
-  auto end() const { return aobs.end(); }
-};
-
-struct atom {
-  std::string symbol;
-  int Z;
-  double x;
-  double y;
-  double z;
-
-  atom(std::string symbol, int Z, double x, double y, double z)
-      : symbol(symbol), Z(Z), x(x), y(y), z(z) {}
-};
-
 struct molecule {
   std::vector<atomic_orbital> aos;
   std::vector<int> Z_list;
@@ -93,21 +65,6 @@ struct molecule {
   const atomic_orbital &operator[](size_t index) const { return aos[index]; }
 };
 
-struct molecular_system {
-  using mol_type = std::tuple<molecule, orbital_set>;
-  std::vector<mol_type> mol_sys;
-
-  molecular_system() = default;
-  molecular_system(std::initializer_list<mol_type> mol_ao) : mol_sys(mol_ao) {}
-
-  void push_back(const mol_type &mols) { mol_sys.push_back(mols); }
-
-  size_t size() const { return mol_sys.size(); }
-
-  const mol_type &operator[](size_t index) const { return mol_sys[index]; }
-};
-
 std::ostream &operator<<(std::ostream &os, const primitive_gaussian &pg);
 std::ostream &operator<<(std::ostream &os, const atomic_orbital &ao);
-std::ostream &operator<<(std::ostream &os, const atom &atm);
 std::ostream &operator<<(std::ostream &os, const molecule &mol);
