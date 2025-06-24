@@ -1,76 +1,21 @@
 #include "functions.hpp"
-#include <algorithm>
 #include <boost/math/special_functions/gamma.hpp>
 #include <classes.hpp>
-#include <eigen3/Eigen/Dense>
-#include <eigen3/unsupported/Eigen/MatrixFunctions>
+#include <unsupported/Eigen/MatrixFunctions>
 
-using tensor4d = std::vector<std::vector<std::vector<std::vector<double>>>>;
-using matrix2d = std::vector<std::vector<double>>;
+using tensor4d = Eigen::Tensor<double, 4>;
+using matrix2d = Eigen::MatrixXd;
 
 double dot(const coord_type &a, const coord_type &b) {
   return a.x * b.x + a.y * b.y + a.z * b.z;
 }
 
-matrix2d add_matrices(const matrix2d &A, const matrix2d &B) {
-  assert(A.size() == B.size());
-  assert(A[0].size() == B[0].size());
 
-  int rows = A.size();
-  int cols = A[0].size();
-
-  matrix2d result(rows, std::vector<double>(cols, 0.0));
-
-  for (int i = 0; i < rows; i++) {
-    for (int j = 0; j < cols; j++) {
-      result[i][j] = A[i][j] + B[i][j];
-    }
-  }
-  return result;
-}
-
-matrix2d mult_matrices(const matrix2d &A, const matrix2d &B) {
-  int rows = A.size();
-  int cols = A[0].size();
-  int inner = B.size();
-
-  assert(A[0].size() == inner);
-
-  matrix2d result(rows, std::vector<double>(cols, 0.0));
-
-  for (int i = 0; i < rows; i++) {
-    for (int j = 0; j < cols; j++) {
-      for (int k = 0; k < inner; k++) {
-        result[i][j] += A[i][k] * B[k][j];
-      }
-    }
-  }
-  return result;
-}
-
-Eigen::MatrixXd to_eigen(const std::vector<std::vector<double>> &mat) {
-  int rows = mat.size();
-  int cols = mat[0].size();
-  Eigen::MatrixXd eigen_mat(rows, cols);
-  for (int i = 0; i < rows; ++i)
-    for (int j = 0; j < cols; ++j)
-      eigen_mat(i, j) = mat[i][j];
-  return eigen_mat;
-}
-
-std::vector<std::vector<double>> from_eigen(const Eigen::MatrixXd &mat) {
-  std::vector<std::vector<double>> result(mat.rows(),
-                                          std::vector<double>(mat.cols()));
-  for (int i = 0; i < mat.rows(); ++i)
-    for (int j = 0; j < mat.cols(); ++j)
-      result[i][j] = mat(i, j);
-  return result;
-}
-
-std::vector<std::vector<double>> overlap(molecule mol) {
+matrix2d overlap(molecule mol) {
   int nbasis = mol.size();
 
-  std::vector<std::vector<double>> S(nbasis, std::vector<double>(nbasis, 0.0));
+  matrix2d S(nbasis, nbasis);
+  S.setZero();
 
   for (int i = 0; i < nbasis; i++) {
     for (int j = 0; j < nbasis; j++) {
@@ -84,7 +29,7 @@ std::vector<std::vector<double>> overlap(molecule mol) {
           auto q = (mol[i][k].alpha * mol[j][l].alpha) / p;
           auto Q = mol[i].coords - mol[j].coords;
           auto Q2 = dot(Q, Q);
-          S[i][j] += N * mol[i][k].coeff * mol[j][l].coeff * std::exp(-q * Q2) *
+          S(i,j) += N * mol[i][k].coeff * mol[j][l].coeff * std::exp(-q * Q2) *
                      pow((M_PI / p), (3. / 2.));
         }
       }
@@ -93,10 +38,11 @@ std::vector<std::vector<double>> overlap(molecule mol) {
   return S;
 }
 
-std::vector<std::vector<double>> kinetic(molecule mol) {
+matrix2d kinetic(molecule mol) {
   int nbasis = mol.size();
 
-  std::vector<std::vector<double>> T(nbasis, std::vector<double>(nbasis, 0.0));
+  matrix2d  T(nbasis, nbasis);
+  T.setZero();
 
   for (int i = 0; i < nbasis; i++) {
     for (int j = 0; j < nbasis; j++) {
@@ -123,12 +69,12 @@ std::vector<std::vector<double>> kinetic(molecule mol) {
 
           auto s = std::exp(-q * Q2) * pow((M_PI / p), 1.5) * N * cacb;
 
-          T[i][j] += 3.0 * mol[j][l].alpha * s;
-          T[i][j] -=
+          T(i,j) += 3.0 * mol[j][l].alpha * s;
+          T(i,j) -=
               2.0 * mol[j][l].alpha * mol[j][l].alpha * s * (PGx2 + 0.5 / p);
-          T[i][j] -=
+          T(i,j) -=
               2.0 * mol[j][l].alpha * mol[j][l].alpha * s * (PGy2 + 0.5 / p);
-          T[i][j] -=
+          T(i,j) -=
               2.0 * mol[j][l].alpha * mol[j][l].alpha * s * (PGz2 + 0.5 / p);
         }
       }
@@ -146,8 +92,7 @@ double boys(double x, int n) {
   }
 }
 
-std::vector<std::vector<double>>
-electron_nuclear_attraction(molecule mol, std::vector<int> Z_list) {
+matrix2d electron_nuclear_attraction(molecule mol, std::vector<int> Z_list) {
   int natoms = Z_list.size();
   int nbasis = mol.size();
 
@@ -171,8 +116,8 @@ electron_nuclear_attraction(molecule mol, std::vector<int> Z_list) {
                                 }),
                     coordinates.end());
 
-  std::vector<std::vector<double>> V_ne(nbasis,
-                                        std::vector<double>(nbasis, 0.0));
+  matrix2d V_ne(nbasis,nbasis);
+  V_ne.setZero();
 
   for (int atom = 0; atom < natoms; atom++) {
     for (int i = 0; i < nbasis; i++) {
@@ -198,7 +143,7 @@ electron_nuclear_attraction(molecule mol, std::vector<int> Z_list) {
             auto Q = mol[i].coords - mol[j].coords;
             auto Q2 = dot(Q, Q);
 
-            V_ne[i][j] += N * cacb * -Z_list[atom] * (2.0 * M_PI / p) *
+            V_ne(i,j) += N * cacb * -Z_list[atom] * (2.0 * M_PI / p) *
                           std::exp(-q * Q2) * boys(p * PG2, 0);
           }
         }
@@ -211,10 +156,8 @@ electron_nuclear_attraction(molecule mol, std::vector<int> Z_list) {
 tensor4d electron_electron_repulsion(molecule mol) {
   int nbasis = mol.size();
 
-  tensor4d V_ee(nbasis,
-                std::vector<std::vector<std::vector<double>>>(
-                    nbasis, std::vector<std::vector<double>>(
-                                nbasis, std::vector<double>(nbasis, 0.0))));
+  tensor4d V_ee(nbasis, nbasis, nbasis, nbasis);
+  V_ee.setZero();
 
   for (int i = 0; i < nbasis; i++) {
     for (int j = 0; j < nbasis; j++) {
@@ -264,7 +207,7 @@ tensor4d electron_electron_repulsion(molecule mol) {
                   auto term3 = std::exp(-qij * Q2ij);
                   auto term4 = std::exp(-qkl * Q2kl);
 
-                  V_ee[i][j][k][l] += N * cicjckcl * term1 * term2 * term3 *
+                  V_ee(i,j, k, l) += N * cicjckcl * term1 * term2 * term3 *
                                       term4 * boys(PpijPpkl2 / denom, 0);
                 }
               }
@@ -307,41 +250,39 @@ nuclear_nuclear_repulsion_energy(const std::vector<coord_type> &coord_list,
   return E_NN;
 }
 
-std::vector<std::vector<double>>
-compute_density_matrix(const std::vector<std::vector<double>> &mos, int n_occ) {
-  int nbasis_functions = mos.size();
+matrix2d compute_density_matrix(const matrix2d &mos, int n_occ) {
+  int nbasis_functions = mos.rows();
 
-  std::vector<std::vector<double>> density_matrix(
-      nbasis_functions, std::vector<double>(nbasis_functions, 0.0));
+  matrix2d density_matrix(nbasis_functions, nbasis_functions);
+  density_matrix.setZero();
 
   double occupation = 2.0;
 
   for (int i = 0; i < nbasis_functions; i++) {
     for (int j = 0; j < nbasis_functions; j++) {
       for (int o = 0; o < n_occ; o++) {
-        auto C = mos[i][o];
-        auto C_dagger = mos[j][o];
-        density_matrix[i][j] += occupation * C * C_dagger;
+        auto C = mos(i,o);
+        auto C_dagger = mos(j,o);
+        density_matrix(i,j) += occupation * C * C_dagger;
       }
     }
   }
   return density_matrix;
 }
 
-std::vector<std::vector<double>>
-compute_G(std::vector<std::vector<double>> dens_mat, tensor4d Vee) {
-  int nbasis_functions = dens_mat.size();
-  std::vector<std::vector<double>> G(
-      nbasis_functions, std::vector<double>(nbasis_functions, 0.0));
+matrix2d compute_G(matrix2d dens_mat, tensor4d Vee) {
+  int nbasis_functions = dens_mat.rows();
+  matrix2d G(nbasis_functions, nbasis_functions);
+  G.setZero();
 
   for (int i = 0; i < nbasis_functions; i++) {
     for (int j = 0; j < nbasis_functions; j++) {
       for (int k = 0; k < nbasis_functions; k++) {
         for (int l = 0; l < nbasis_functions; l++) {
-          auto density = dens_mat[k][l];
-          auto J = Vee[i][j][k][l];
-          auto K = Vee[i][l][k][j];
-          G[i][j] += density * (J - 0.5 * K);
+          auto density = dens_mat(k,l);
+          auto J = Vee(i,j,k,l);
+          auto K = Vee(i,l,k,j);
+          G(i,j) += density * (J - 0.5 * K);
         }
       }
     }
@@ -353,13 +294,13 @@ double compute_electronic_energy_expectation_value(matrix2d dens_mat,
                                                    matrix2d T, matrix2d Vne,
                                                    matrix2d G) {
 
-  auto Hcore = add_matrices(T, Vne);
+  auto Hcore = T + Vne;
   auto electronic_energy = 0.0;
-  auto nbasis_functions = dens_mat.size();
+  auto nbasis_functions = dens_mat.rows();
 
   for (int i = 0; i < nbasis_functions; i++) {
     for (int j = 0; j < nbasis_functions; j++) {
-      electronic_energy += dens_mat[i][j] * (Hcore[i][j] + 0.5 * G[i][j]);
+      electronic_energy += dens_mat(i,j) * (Hcore(i,j) + 0.5 * G(i,j));
     }
   }
   return electronic_energy;
@@ -374,21 +315,22 @@ scf_cycle(std::tuple<matrix2d, matrix2d, matrix2d, tensor4d> molecular_terms,
 
   int nbasis_functions = mol.size();
 
-  matrix2d dens_mat(nbasis_functions,
-                    std::vector<double>(nbasis_functions, 0.0));
+  matrix2d dens_mat(nbasis_functions, nbasis_functions);
+  dens_mat.setZero();
 
   for (int scf_step = 0; scf_step < max_iter; scf_step++) {
     auto electronic_energy_old = electronic_energy;
     auto G = compute_G(dens_mat, Vee);
-    auto F = add_matrices(add_matrices(T, Vne), G);
+    auto F = T + Vne + G;
 
-    auto S_eigen = to_eigen(S);
+    auto S_eigen = S;
     auto S_eigen_inv = S_eigen.inverse();
+    // std::cout << "S_eigen_inv: \n" << S_eigen_inv << std::endl;
     auto S_eigen_inv_sqrt = S_eigen_inv.sqrt();
-    auto S_inv_sqrt = from_eigen(S_eigen_inv_sqrt);
+    auto S_inv_sqrt = S_eigen_inv_sqrt;
 
-    auto F_unitS = mult_matrices(S_inv_sqrt, mult_matrices(F, S_inv_sqrt));
-    auto F_unitS_eigen = to_eigen(F_unitS);
+    auto F_unitS = S_inv_sqrt * F * S_inv_sqrt;
+    auto F_unitS_eigen = F_unitS;
 
     Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> solver(F_unitS_eigen);
 
@@ -399,7 +341,7 @@ scf_cycle(std::tuple<matrix2d, matrix2d, matrix2d, tensor4d> molecular_terms,
     Eigen::VectorXd eigenvalues = solver.eigenvalues();
     Eigen::MatrixXd eigenvectors = solver.eigenvectors();
 
-    auto mos = mult_matrices(S_inv_sqrt, from_eigen(eigenvectors));
+    auto mos = S_inv_sqrt * eigenvectors;
 
     dens_mat = compute_density_matrix(mos, 1);
 
