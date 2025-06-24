@@ -13,6 +13,12 @@ Dependencies:
 - Eigen
 - Boost
 
+I recently used this repo to learn how to use vcpkg, so there is now a `vcpkg.json` manifest
+available. I was able to install the Eigen package listed in `vcpkg.json` by running `vcpkg install`
+in the repo directory. There are other actions necessary for CMake and vcpkg to work together, so
+please read the vcpkg docs to ensure these steps are taken. If you already have Eigen installed on
+your system, the regular compilation should still work.
+
 Clone the repo:
 ```bash
 git clone https::/github.com/jlheflin/HartreeFockC++Program.git
@@ -36,5 +42,5 @@ Run the program:
 
 The output should be the following:
 ```bash
-Total energy: -1.065999461556561
+Total energy: -1.078522581996274
 ```
