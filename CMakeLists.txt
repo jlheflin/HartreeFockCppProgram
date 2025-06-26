@@ -32,6 +32,25 @@ target_link_libraries(program PRIVATE
     # nlohmann_json::nlohmann_json
     # cereal::cereal parallelzone
 )
+
+if(BUILD_TESTING)
+    include(CTest)
+
+    set(CXX_TEST_DIR "${CMAKE_CURRENT_LIST_DIR}/tests/cxx")
+    find_package(Catch2 3 QUIET)
+    if(NOT Catch2_FOUND)
+        FetchContent_Declare(
+            Catch2
+            GIT_REPOSITORY https://github.com/catchorg/Catch2.git
+            GIT_TAG v3.8.1
+        )
+        FetchContent_MakeAvailable(Catch2)
+    endif()
+
+    file(GLOB_RECURSE cxx_test_sources
+        "${CXX_TEST_DIR}/unit_tests/*.cpp"
+    )
+
 install(TARGETS program
     RUNTIME DESTINATION bin
 )
