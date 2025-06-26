@@ -6,7 +6,7 @@ YouTube Playlist (also, here is the [GitHub](https://github.com/nickelandcopper/
 HatreeFockPythonProgram).
 
 Currently the code is set up with the 6-31G basis set for Hydrogen, based on the values
-available from the [Basis Set Exhange](www.basissetexchange.org/basis/6-31g/format/json/?version=1&elements=1) [Ref](https://www.basissetexchange.org/references/6-31g/format/txt/?version=1&elements=1)
+available from the [Basis Set Exhange](https://www.basissetexchange.org/basis/6-31g/format/json/?version=1&elements=1) [Ref](https://www.basissetexchange.org/references/6-31g/format/txt/?version=1&elements=1)
 
 ## Build Instructions
 
