@@ -55,6 +55,7 @@ Build the program and have the executable in `./result/bin/`:
 ```bash
 cd ./HartreeFockCppProgram
 nix build
+./result/bin/program
 ```
 
 Run the program directly:
