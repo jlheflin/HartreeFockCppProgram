@@ -24,7 +24,7 @@ your system, the regular compilation should still work.
 
 Clone the repo:
 ```bash
-git clone https::/github.com/jlheflin/HartreeFockCppProgram.git
+git clone https://github.com/jlheflin/HartreeFockCppProgram.git
 ```
 
 
