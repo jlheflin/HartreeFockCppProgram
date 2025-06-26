@@ -3,7 +3,7 @@
 This is a reimplementation of the HartreeFockPythonProgram from
 [NickelAndCopper's](https://youtube.com/playlist?list=PL-hN8vfRaU7jSFHN1ZSAMNe_2nXhwAmzM&si=ANjI8kPn-5v_3Kvs)
 YouTube Playlist (also, here is the [GitHub](https://github.com/nickelandcopper/HartreeFockPythonProgram) for the
-HatreeFockPytonProgram).
+HatreeFockPythonProgram).
 
 ## Build Instructions
 
