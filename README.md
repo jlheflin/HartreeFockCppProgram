@@ -63,7 +63,7 @@ cd ./HartreeFockCppProgram
 nix run
 ```
 
-
+## Build Result
 The output should be the following:
 ```bash
 Total energy: -1.078522581996274
