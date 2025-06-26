@@ -4,3 +4,4 @@ notes.md
 vcpkg_installed/
 result/
 result
+cmake/
