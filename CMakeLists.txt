@@ -13,23 +13,8 @@ set(CMAKE_INSTALL_LIBDIR "lib")
 set(CMAKE_INSTALL_INCLUDEDIR "include")
 set(FETCHCONTENT_FULLY_DISCONNECTED OFF)
 
-# FetchContent_Declare(
-#     ParallelZone
-#     GIT_REPOSITORY https://github.com/NWChemEx/ParallelZone.git
-#     GIT_TAG no_cmaize
-# )
-# FetchContent_MakeAvailable(ParallelZone)
-# set(FETCHCONTENT_SOURCE_DIR_PARALLELZONE /home/jacob/Projects/ParallelZone)
-
-# FetchContent_Declare(
-#     TensorWrapper
-#     GIT_REPOSITORY https://github.com/NWChemEx/TensorWrapper.git
-#     GIT_TAG master
-# )
-# FetchContent_MakeAvailable(TensorWrapper)
-# set(FETCHCONTENT_TENSORWRAPPER_CMAKE_ARGS
-#     -DBUILD_PYBIND1_PYBINDINGS=OFF
-# )
+# include(cmake/fetch_parallelzone.cmake)
+# include(cmake/fetch_tensorwrapper.cmake)
 
 find_package(Eigen3 CONFIG REQUIRED)
 # find_package(nlohmann_json CONFIG REQUIRED)
