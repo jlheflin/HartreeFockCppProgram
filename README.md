@@ -8,7 +8,7 @@ for the HatreeFockPythonProgram).
 
 Currently the code is set up with the STO-3G, STO-6g, 3-21G, 6-31G, and 6-311G basis set for Hydrogen,
 based on the values available from the [Basis Set
-Exhange](https://www.basissetexchange.org/basis/6-31g/format/json/?version=1&elements=1)
+Exchange](https://www.basissetexchange.org/basis/6-31g/format/json/?version=1&elements=1)
 
 STO-3G, STO-6G Reference: [Ref](https://www.basissetexchange.org/references/sto-6g/format/txt/?version=1&elements=1)  
 3-21G Reference: [Ref](https://www.basissetexchange.org/references/3-21g/format/txt/?version=1&elements=1)  
@@ -100,7 +100,8 @@ Basis: 6-31g.1.json
 Total energy: -1.07852258199628
 
 Basis: 6-311g.0.json
-Total energy: -1.0802508129054074```
+Total energy: -1.0802508129054074
+```
 
 # References
 Pritchard, Benjamin P., Doaa Altarawy, Brett Didier, Tara D. Gibson, and
