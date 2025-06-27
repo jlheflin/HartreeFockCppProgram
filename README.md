@@ -22,6 +22,7 @@ Dependencies:
 - cmake
 - Eigen
 - Boost
+- nlohmann's JSON
 
 I recently used this repo to learn how to use vcpkg, so there is now a
 `vcpkg.json` manifest available. I was able to install the Eigen package
