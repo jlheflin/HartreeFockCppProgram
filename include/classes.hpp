@@ -56,6 +56,7 @@ struct molecule {
   std::vector<int> Z_list;
   std::vector<coord_type> coord_list;
 
+  molecule() = default;
   molecule(std::initializer_list<atomic_orbital> aos) : aos(aos) {}
 
   void push_back(const atomic_orbital &ao) { aos.push_back(ao); }

@@ -5,6 +5,28 @@
 
 using tensor4d = Eigen::Tensor<double, 4>;
 using matrix2d = Eigen::MatrixXd;
+using json = nlohmann::json;
+
+std::vector<atomic_orbital> ao_basis_from_file(json& basis_data, std::vector<coord_type>& coords) {
+  std::vector<atomic_orbital> aos;
+  json shells = basis_data["elements"]["1"]["electron_shells"];
+
+  for(auto& coord : coords) {
+    for(auto& entry : shells) {
+      auto num_pg = entry["coefficients"][0].size();
+      atomic_orbital ao;
+      for(int i = 0; i < num_pg; i++) {
+        double coeff = std::stod(entry["coefficients"][0][i].get<std::string>());
+        double alpha = std::stod(entry["exponents"][i].get<std::string>());
+        primitive_gaussian pg(alpha, coeff);
+        ao.push_back(pg);
+      }
+      ao.coords = coord;
+      aos.push_back(ao);
+    }
+  }
+  return aos;
+}
 
 double dot(const coord_type &a, const coord_type &b) {
   return a.x * b.x + a.y * b.y + a.z * b.z;

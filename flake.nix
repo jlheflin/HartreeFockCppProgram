@@ -18,7 +18,7 @@
 
           src = ./.;
           nativeBuildInputs = [ pkgs.cmake ];
-          buildInputs = [ pkgs.boost pkgs.eigen ];
+          buildInputs = [ pkgs.boost pkgs.eigen pkgs.nlohmann_json ];
 
           cmakeFlags = [ "-DCMAKE_INSTALL_PREFIX=${placeholder "out"}" ];
 

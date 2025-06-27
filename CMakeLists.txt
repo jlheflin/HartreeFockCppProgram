@@ -17,7 +17,7 @@ set(FETCHCONTENT_FULLY_DISCONNECTED OFF)
 # include(cmake/fetch_tensorwrapper.cmake)
 
 find_package(Eigen3 CONFIG REQUIRED)
-# find_package(nlohmann_json CONFIG REQUIRED)
+find_package(nlohmann_json CONFIG REQUIRED)
 # find_package(cereal CONFIG REQUIRED)
 set(SOURCES
     src/main.cpp

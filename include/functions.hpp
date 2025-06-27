@@ -1,9 +1,11 @@
 #pragma once
 #include <classes.hpp>
 #include <unsupported/Eigen/CXX11//Tensor>
+#include <nlohmann/json.hpp>
 
 using tensor4d = Eigen::Tensor<double, 4>;
 using matrix2d = Eigen::MatrixXd;
+using json = nlohmann::json;
 
 matrix2d overlap(molecule mol);
 matrix2d kinetic(molecule mol);
@@ -24,3 +26,5 @@ double compute_electronic_energy_expectation_value(matrix2d dens_mat,
 double
 scf_cycle(std::tuple<matrix2d, matrix2d, matrix2d, tensor4d> molecular_terms,
           std::tuple<double, int> scf_parameters, molecule mol);
+
+std::vector<atomic_orbital> ao_basis_from_file(json& basis_data, std::vector<coord_type>& coords);

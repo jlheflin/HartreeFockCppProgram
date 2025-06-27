@@ -2,40 +2,38 @@
 #include <Eigen/Eigen>
 #include <functions.hpp>
 #include <iomanip>
+#include <nlohmann/json.hpp>
+#include <fstream>
+
+using json = nlohmann::json;
 
 int main() {
 
-  auto six_31g_h_basis_alpha =
-      std::vector{0.1873113696E+02, 0.2825394365E+01, 0.6401216923E+00, 0.1612777588E+00};
-  auto six_31g_h_basis_coeff =
-      std::vector{0.3349460434E-01, 0.2347269535E+00, 0.8137573261E+00, 1.0000000};
+  json basis;
 
-  atomic_orbital h1_1s, h2_1s, h1_2s, h2_2s;
+  std::ifstream file("6-31g.1.json");
 
-  for (int i = 0; i < 3; i++) {
-    auto pg_1 =
-        primitive_gaussian(six_31g_h_basis_alpha[i], six_31g_h_basis_coeff[i]);
-    auto pg_2 =
-        primitive_gaussian(six_31g_h_basis_alpha[i], six_31g_h_basis_coeff[i]);
-    h1_1s.push_back(pg_1);
-    h2_1s.push_back(pg_2);
+  if (!file.is_open()){
+      throw std::runtime_error("Failed to open basis file!");
   }
-  for (int i = 3; i < 4; i++) {
-    auto pg_1 =
-        primitive_gaussian(six_31g_h_basis_alpha[i], six_31g_h_basis_coeff[i]);
-    auto pg_2 =
-        primitive_gaussian(six_31g_h_basis_alpha[i], six_31g_h_basis_coeff[i]);
-    h1_2s.push_back(pg_1);
-    h2_2s.push_back(pg_2);
-  }
-  h1_1s.coords = {0., 0., 0.};
-  h2_1s.coords = {0., 0., 1.};
-  h1_2s.coords = {0., 0., 0.};
-  h2_2s.coords = {0., 0., 1.};
 
-  molecule mol = {h1_1s, h2_1s, h1_2s, h2_2s};
+  file >> basis;
+
+  std::vector<coord_type> coord_list;
+  coord_list.push_back({0., 0., 0.});
+  coord_list.push_back({0., 0., 1.});
+
+  auto h_ao_basis =  ao_basis_from_file(basis, coord_list);
+
+  molecule mol;
+  for (const atomic_orbital& ao : h_ao_basis) {
+      mol.push_back(ao);
+  }
   mol.Z_list = {1, 1};
-  mol.coord_list = {h1_1s.coords, h2_1s.coords};
+
+  for (const coord_type& coord : coord_list) {
+      mol.coord_list.push_back(coord);
+  }
 
   auto S = overlap(mol);
   auto T = kinetic(mol);
