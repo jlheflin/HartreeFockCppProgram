@@ -87,8 +87,20 @@ nix run
 The output should be the following:
 
 ``` bash
+Basis: sto-3g.1.json
+Total energy: -1.0659994615565607
+
+Basis: sto-6g.1.json
+Total energy: -1.0758904077276754
+
+Basis: 3-21g.1.json
+Total energy: -1.0719530233452628
+
+Basis: 6-31g.1.json
 Total energy: -1.07852258199628
-```
+
+Basis: 6-311g.0.json
+Total energy: -1.0802508129054074```
 
 # References
 Pritchard, Benjamin P., Doaa Altarawy, Brett Didier, Tara D. Gibson, and
