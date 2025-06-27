@@ -79,7 +79,7 @@ nix run
 The output should be the following:
 
 ``` bash
-Total energy: -1.078522581996274
+Total energy: -1.07852258199628
 ```
 
 # References

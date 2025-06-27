@@ -55,7 +55,7 @@ int main() {
   // std::cout << V_ee << std::endl;
   // std::cout << "E_NN Value: " << E_NN << std::endl;
   // std::cout << "Electronic energy: " << electronic_energy << std::endl;
-  std::cout << std::setprecision(16) << "Total energy: " << total_energy
+  std::cout << std::setprecision(17) << "Total energy: " << total_energy
             << std::endl;
 
   return 0;

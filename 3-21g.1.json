@@ -1,0 +1,67 @@
+{
+    "molssi_bse_schema": {
+        "schema_type": "complete",
+        "schema_version": "0.1"
+    },
+    "revision_description": "Data from Gaussian 09",
+    "revision_date": "2019-02-21",
+    "elements": {
+        "1": {
+            "electron_shells": [
+                {
+                    "function_type": "gto",
+                    "region": "valence",
+                    "angular_momentum": [
+                        0
+                    ],
+                    "exponents": [
+                        "0.5447178000E+01",
+                        "0.8245472400E+00"
+                    ],
+                    "coefficients": [
+                        [
+                            "0.1562849787E+00",
+                            "0.9046908767E+00"
+                        ]
+                    ]
+                },
+                {
+                    "function_type": "gto",
+                    "region": "valence",
+                    "angular_momentum": [
+                        0
+                    ],
+                    "exponents": [
+                        "0.1831915800E+00"
+                    ],
+                    "coefficients": [
+                        [
+                            "1.0000000"
+                        ]
+                    ]
+                }
+            ],
+            "references": [
+                {
+                    "reference_description": "21G Split-valence basis set for H,He",
+                    "reference_keys": [
+                        "binkley1980a"
+                    ]
+                }
+            ]
+        }
+    },
+    "version": "1",
+    "function_types": [
+        "gto"
+    ],
+    "names": [
+        "3-21G"
+    ],
+    "tags": [],
+    "family": "pople",
+    "description": "3-21G Split-valence basis set",
+    "role": "orbital",
+    "auxiliaries": {},
+    "name": "3-21G"
+}

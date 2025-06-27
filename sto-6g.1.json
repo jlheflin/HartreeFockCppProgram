@@ -1,0 +1,60 @@
+{
+    "molssi_bse_schema": {
+        "schema_type": "complete",
+        "schema_version": "0.1"
+    },
+    "revision_description": "Data from Gaussian09",
+    "revision_date": "2018-06-19",
+    "elements": {
+        "1": {
+            "electron_shells": [
+                {
+                    "function_type": "gto",
+                    "region": "",
+                    "angular_momentum": [
+                        0
+                    ],
+                    "exponents": [
+                        "0.3552322122E+02",
+                        "0.6513143725E+01",
+                        "0.1822142904E+01",
+                        "0.6259552659E+00",
+                        "0.2430767471E+00",
+                        "0.1001124280E+00"
+                    ],
+                    "coefficients": [
+                        [
+                            "0.9163596281E-02",
+                            "0.4936149294E-01",
+                            "0.1685383049E+00",
+                            "0.3705627997E+00",
+                            "0.4164915298E+00",
+                            "0.1303340841E+00"
+                        ]
+                    ]
+                }
+            ],
+            "references": [
+                {
+                    "reference_description": "STO-6G Minimal Basis (6 functions/AO)",
+                    "reference_keys": [
+                        "hehre1969a"
+                    ]
+                }
+            ]
+        }
+    },
+    "version": "1",
+    "function_types": [
+        "gto"
+    ],
+    "names": [
+        "STO-6G"
+    ],
+    "tags": [],
+    "family": "sto",
+    "description": "STO-6G Minimal Basis (6 functions/AO)",
+    "role": "orbital",
+    "auxiliaries": {},
+    "name": "STO-6G"
+}
