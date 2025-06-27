@@ -17,8 +17,11 @@ STO-3G, STO-6G Reference: [Ref](https://www.basissetexchange.org/references/sto-
 
 ## Build Instructions
 
-Dependencies: - C++ compiler (I used GCC version 15.1.1) - cmake -
-Eigen - Boost
+Dependencies:
+- C++ compiler (I used GCC version 15.1.1)
+- cmake
+- Eigen
+- Boost
 
 I recently used this repo to learn how to use vcpkg, so there is now a
 `vcpkg.json` manifest available. I was able to install the Eigen package
