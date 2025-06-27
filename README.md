@@ -10,6 +10,10 @@ Currently the code is set up with the STO-3G, STO-6g, 3-21G, 6-31G, and 6-311G b
 based on the values available from the [Basis Set
 Exhange](https://www.basissetexchange.org/basis/6-31g/format/json/?version=1&elements=1)
 
+STO-3G, STO-6G Reference: [Ref](https://www.basissetexchange.org/references/sto-6g/format/txt/?version=1&elements=1)
+3-21G Reference: [Ref](https://www.basissetexchange.org/references/3-21g/format/txt/?version=1&elements=1)
+6-31G Reference: [Ref](https://www.basissetexchange.org/references/6-31g/format/txt/?version=1&elements=1)
+6-311G Reference: [Ref](https://www.basissetexchange.org/references/6-311g/format/txt/?version=0&elements=1)
 
 ## Build Instructions
 
