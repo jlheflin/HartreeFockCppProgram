@@ -8,10 +8,14 @@
 using json = nlohmann::json;
 
 int main() {
+  libint2::initialize();
 
-  std::array<std::string, 5> files = {"sto-3g.1.json", "sto-6g.1.json",
-                                      "3-21g.1.json", "6-31g.1.json",
-                                      "6-311g.0.json"};
+  std::vector<std::string> files = {"sto-3g.1.json"
+                                      // "sto-6g.1.json",
+                                      // "3-21g.1.json",
+                                      // "6-31g.1.json",
+                                      // "6-311g.0.json"
+                                    };
 
   std::vector<coord_type> coord_list;
   coord_list.push_back({0., 0., 0.});
@@ -40,11 +44,15 @@ int main() {
 
   }
 
+  std::ifstream h2("h2.xyz");
+  std::vector<libint2::Atom> atoms = libint2::read_dotxyz(h2);
+  libint2::BasisSet obs("sto-3g", atoms);
+
   for (std::string filename : files) {
     auto mol = molecules[filename];
-    auto S = overlap(mol);
-    auto T = kinetic(mol);
-    auto V_ne = electron_nuclear_attraction(mol, mol.Z_list);
+    auto S = overlap(obs);
+    auto T = kinetic(obs);
+    auto V_ne = electron_nuclear_attraction(obs, atoms);
     auto V_ee = electron_electron_repulsion(mol);
     auto E_NN = nuclear_nuclear_repulsion_energy(mol.coord_list, mol.Z_list);
     auto molecular_terms = std::make_tuple(S, T, V_ne, V_ee);
@@ -52,10 +60,10 @@ int main() {
     auto electronic_energy = scf_cycle(molecular_terms, scf_parameters, mol);
     auto total_energy = electronic_energy + E_NN;
 
-  // std::cout << "Overlap Matrix:\n";
-  // std::cout << S << std::endl;
-  // std::cout << "Kinetic Matrix:\n";
-  // std::cout << T << std::endl;
+  std::cout << "Overlap Matrix:\n";
+  std::cout << S << "\n" << std::endl;
+  std::cout << "Kinetic Matrix:\n";
+  std::cout << T << "\n" << std::endl;
   // std::cout << "V_ne Matrix:\n";
   // std::cout << V_ne << std::endl;
   // std::cout << "V_ee Matrix:\n";
@@ -65,5 +73,6 @@ int main() {
   std::cout << std::setprecision(17) << "Basis: " << filename << "\nTotal energy: " << total_energy << "\n"
             << std::endl;
   }
+  libint2::finalize();
   return 0;
 }

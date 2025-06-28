@@ -2,14 +2,18 @@
 #include <classes.hpp>
 #include <unsupported/Eigen/CXX11//Tensor>
 #include <nlohmann/json.hpp>
+#include <libint2.hpp>
 
 using tensor4d = Eigen::Tensor<double, 4>;
 using matrix2d = Eigen::MatrixXd;
 using json = nlohmann::json;
 
-matrix2d overlap(molecule mol);
-matrix2d kinetic(molecule mol);
-matrix2d electron_nuclear_attraction(molecule mol, std::vector<int> Z_list);
+int test();
+
+
+matrix2d overlap(libint2::BasisSet obs);
+matrix2d kinetic(libint2::BasisSet obs);
+matrix2d electron_nuclear_attraction(libint2::BasisSet obs, std::vector<libint2::Atom> atoms);
 
 tensor4d electron_electron_repulsion(molecule mol);
 double

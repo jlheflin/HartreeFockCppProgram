@@ -33,26 +33,52 @@ double dot(const coord_type &a, const coord_type &b) {
 }
 
 
-matrix2d overlap(molecule mol) {
-  int nbasis = mol.size();
+matrix2d overlap(libint2::BasisSet obs) {
+  // int nbasis = mol.size();
 
-  matrix2d S(nbasis, nbasis);
-  S.setZero();
+  // matrix2d S(nbasis, nbasis);
+  // S.setZero();
 
-  for (int i = 0; i < nbasis; i++) {
-    for (int j = 0; j < nbasis; j++) {
-      int nprimitives_i = mol[i].size();
-      int nprimitives_j = mol[j].size();
+  // for (int i = 0; i < nbasis; i++) {
+  //   for (int j = 0; j < nbasis; j++) {
+  //     int nprimitives_i = mol[i].size();
+  //     int nprimitives_j = mol[j].size();
 
-      for (int k = 0; k < nprimitives_i; k++) {
-        for (int l = 0; l < nprimitives_j; l++) {
-          auto N = mol[i][k].A * mol[j][l].A;
-          auto p = mol[i][k].alpha + mol[j][l].alpha;
-          auto q = (mol[i][k].alpha * mol[j][l].alpha) / p;
-          auto Q = mol[i].coords - mol[j].coords;
-          auto Q2 = dot(Q, Q);
-          S(i,j) += N * mol[i][k].coeff * mol[j][l].coeff * std::exp(-q * Q2) *
-                     pow((M_PI / p), (3. / 2.));
+  //     for (int k = 0; k < nprimitives_i; k++) {
+  //       for (int l = 0; l < nprimitives_j; l++) {
+  //         auto N = mol[i][k].A * mol[j][l].A;
+  //         auto p = mol[i][k].alpha + mol[j][l].alpha;
+  //         auto q = (mol[i][k].alpha * mol[j][l].alpha) / p;
+  //         auto Q = mol[i].coords - mol[j].coords;
+  //         auto Q2 = dot(Q, Q);
+  //         S(i,j) += N * mol[i][k].coeff * mol[j][l].coeff * std::exp(-q * Q2) *
+  //                    pow((M_PI / p), (3. / 2.));
+  //       }
+  //     }
+  //   }
+  // }
+  auto nbasis = obs.size();
+  matrix2d S;
+  S.setZero(nbasis, nbasis);
+
+  libint2::Engine s_engine(libint2::Operator::overlap, obs.max_nprim(), obs.max_l());
+  auto shell2bf = obs.shell2bf();
+  const auto& buf_vec = s_engine.results();
+  for (int i = 0; i < obs.size(); i++) {
+    for (int j = 0; j < obs.size(); j++) {
+      s_engine.compute(obs[i], obs[j]);
+      auto ints_shellset = buf_vec[0];
+      if (ints_shellset == nullptr)
+        continue;
+
+      auto bf1 = shell2bf[i];
+      auto n1 = obs[i].size();
+      auto bf2 = shell2bf[j];
+      auto n2 = obs[j].size();
+
+      for (int k = 0; k < n1; k++) {
+        for (int l = 0; l < n2; l++) {
+          S(i, j) += ints_shellset[k * n2 * l];
         }
       }
     }
@@ -60,44 +86,66 @@ matrix2d overlap(molecule mol) {
   return S;
 }
 
-matrix2d kinetic(molecule mol) {
-  int nbasis = mol.size();
+matrix2d kinetic(libint2::BasisSet obs) {
+  // for (int i = 0; i < nbasis; i++) {
+  //   for (int j = 0; j < nbasis; j++) {
+  //     int nprimitives_i = mol[i].size();
+  //     int nprimitives_j = mol[j].size();
+
+  //     for (int k = 0; k < nprimitives_i; k++) {
+  //       for (int l = 0; l < nprimitives_j; l++) {
+  //         auto N = mol[i][k].A * mol[j][l].A;
+  //         auto cacb = mol[i][k].coeff * mol[j][l].coeff;
+
+  //         auto p = mol[i][k].alpha + mol[j][l].alpha;
+  //         auto P =
+  //             mol[i][k].alpha * mol[i].coords + mol[j][l].alpha * mol[j].coords;
+  //         auto Pp = P / p;
+  //         auto PG = Pp - mol[j].coords;
+  //         auto PGx2 = PG.x * PG.x;
+  //         auto PGy2 = PG.y * PG.y;
+  //         auto PGz2 = PG.z * PG.z;
+
+  //         auto q = (mol[i][k].alpha * mol[j][l].alpha) / p;
+  //         auto Q = mol[i].coords - mol[j].coords;
+  //         auto Q2 = dot(Q, Q);
+
+  //         auto s = std::exp(-q * Q2) * pow((M_PI / p), 1.5) * N * cacb;
+
+  //         T(i,j) += 3.0 * mol[j][l].alpha * s;
+  //         T(i,j) -=
+  //             2.0 * mol[j][l].alpha * mol[j][l].alpha * s * (PGx2 + 0.5 / p);
+  //         T(i,j) -=
+  //             2.0 * mol[j][l].alpha * mol[j][l].alpha * s * (PGy2 + 0.5 / p);
+  //         T(i,j) -=
+  //             2.0 * mol[j][l].alpha * mol[j][l].alpha * s * (PGz2 + 0.5 / p);
+  //       }
+  //     }
+  //   }
+  // }
+  int nbasis = obs.size();
 
   matrix2d  T(nbasis, nbasis);
   T.setZero();
 
-  for (int i = 0; i < nbasis; i++) {
-    for (int j = 0; j < nbasis; j++) {
-      int nprimitives_i = mol[i].size();
-      int nprimitives_j = mol[j].size();
+  libint2::Engine t_engine(libint2::Operator::kinetic, obs.max_nprim(), obs.max_l());
+  auto shell2bf = obs.shell2bf();
+  const auto& buf_vec = t_engine.results();
+  for (int i = 0; i < obs.size(); i++) {
+    for (int j = 0; j < obs.size(); j++) {
+      t_engine.compute(obs[i], obs[j]);
+      auto ints_shellset = buf_vec[0];
+      if (ints_shellset == nullptr)
+        continue;
 
-      for (int k = 0; k < nprimitives_i; k++) {
-        for (int l = 0; l < nprimitives_j; l++) {
-          auto N = mol[i][k].A * mol[j][l].A;
-          auto cacb = mol[i][k].coeff * mol[j][l].coeff;
+      auto bf1 = shell2bf[i];
+      auto n1 = obs[i].size();
+      auto bf2 = shell2bf[j];
+      auto n2 = obs[j].size();
 
-          auto p = mol[i][k].alpha + mol[j][l].alpha;
-          auto P =
-              mol[i][k].alpha * mol[i].coords + mol[j][l].alpha * mol[j].coords;
-          auto Pp = P / p;
-          auto PG = Pp - mol[j].coords;
-          auto PGx2 = PG.x * PG.x;
-          auto PGy2 = PG.y * PG.y;
-          auto PGz2 = PG.z * PG.z;
-
-          auto q = (mol[i][k].alpha * mol[j][l].alpha) / p;
-          auto Q = mol[i].coords - mol[j].coords;
-          auto Q2 = dot(Q, Q);
-
-          auto s = std::exp(-q * Q2) * pow((M_PI / p), 1.5) * N * cacb;
-
-          T(i,j) += 3.0 * mol[j][l].alpha * s;
-          T(i,j) -=
-              2.0 * mol[j][l].alpha * mol[j][l].alpha * s * (PGx2 + 0.5 / p);
-          T(i,j) -=
-              2.0 * mol[j][l].alpha * mol[j][l].alpha * s * (PGy2 + 0.5 / p);
-          T(i,j) -=
-              2.0 * mol[j][l].alpha * mol[j][l].alpha * s * (PGz2 + 0.5 / p);
+      for (int k = 0; k < n1; k++) {
+        for (int l = 0; l < n2; l++) {
+          T(i, j) += ints_shellset[k * n2 * l];
         }
       }
     }
@@ -114,64 +162,95 @@ double boys(double x, int n) {
   }
 }
 
-matrix2d electron_nuclear_attraction(molecule mol, std::vector<int> Z_list) {
-  int natoms = Z_list.size();
-  int nbasis = mol.size();
+matrix2d electron_nuclear_attraction(libint2::BasisSet obs, std::vector<libint2::Atom> atoms) {
+  // molecule mol, std::vector<int> Z_list
+  // int natoms = Z_list.size();
+  // int nbasis = obs.size();
 
-  std::vector<coord_type> coordinates;
-  for (int i = 0; i < nbasis; i++) {
-    coordinates.push_back(mol[i].coords);
-  }
+  // std::vector<coord_type> coordinates;
+  // for (int i = 0; i < nbasis; i++) {
+  //   coordinates.push_back(mol[i].coords);
+  // }
 
-  std::sort(coordinates.begin(), coordinates.end(),
-            [](const coord_type &a, const coord_type &b) {
-              if (a.x != b.x)
-                return a.x < b.x;
-              if (a.y != b.y)
-                return a.y < b.y;
-              return a.z < b.z;
-            });
+  // std::sort(coordinates.begin(), coordinates.end(),
+  //           [](const coord_type &a, const coord_type &b) {
+  //             if (a.x != b.x)
+  //               return a.x < b.x;
+  //             if (a.y != b.y)
+  //               return a.y < b.y;
+  //             return a.z < b.z;
+  //           });
 
-  coordinates.erase(std::unique(coordinates.begin(), coordinates.end(),
-                                [](const coord_type &a, const coord_type &b) {
-                                  return a.x == b.x && a.y == b.y && a.z == b.z;
-                                }),
-                    coordinates.end());
-
+  // coordinates.erase(std::unique(coordinates.begin(), coordinates.end(),
+  //                               [](const coord_type &a, const coord_type &b) {
+  //                                 return a.x == b.x && a.y == b.y && a.z == b.z;
+  //                               }),
+  //                   coordinates.end());
+  int nbasis = obs.size();
   matrix2d V_ne(nbasis,nbasis);
   V_ne.setZero();
+  std::vector<std::pair<libint2::scalar_type, std::array<libint2::scalar_type, 3>>> q;
+  for (const auto& atom : atoms) {
+    q.push_back({static_cast<libint2::scalar_type>(atom.atomic_number), {{atom.x, atom.y, atom.z}}});
+  }
 
-  for (int atom = 0; atom < natoms; atom++) {
-    for (int i = 0; i < nbasis; i++) {
-      for (int j = 0; j < nbasis; j++) {
-        int nprimitives_i = mol[i].size();
-        int nprimitives_j = mol[j].size();
+  libint2::Engine n_engine(libint2::Operator::nuclear, obs.max_nprim(), obs.max_l());
+  n_engine.set_params(q);
 
-        for (int k = 0; k < nprimitives_i; k++) {
-          for (int l = 0; l < nprimitives_j; l++) {
+  auto shell2bf = obs.shell2bf();
+  const auto& buf_vec = n_engine.results();
+  for (int i = 0; i < obs.size(); i++) {
+    for (int j = 0; j < obs.size(); j++) {
+      n_engine.compute(obs[i], obs[j]);
+      auto ints_shellset = buf_vec[0];
+      if (ints_shellset == nullptr)
+        continue;
 
-            auto N = mol[i][k].A * mol[j][l].A;
-            auto cacb = mol[i][k].coeff * mol[j][l].coeff;
+      auto bf1 = shell2bf[i];
+      auto n1 = obs[i].size();
+      auto bf2 = shell2bf[j];
+      auto n2 = obs[j].size();
 
-            auto p = mol[i][k].alpha + mol[j][l].alpha;
-            auto P = mol[i][k].alpha * mol[i].coords +
-                     mol[j][l].alpha * mol[j].coords;
-            auto Pp = P / p;
-
-            auto PG = P / p - coordinates[atom];
-            auto PG2 = dot(PG, PG);
-
-            auto q = mol[i][k].alpha * mol[j][l].alpha / p;
-            auto Q = mol[i].coords - mol[j].coords;
-            auto Q2 = dot(Q, Q);
-
-            V_ne(i,j) += N * cacb * -Z_list[atom] * (2.0 * M_PI / p) *
-                          std::exp(-q * Q2) * boys(p * PG2, 0);
-          }
+      for (int k = 0; k < n1; k++) {
+        for (int l = 0; l < n2; l++) {
+          V_ne(i, j) += ints_shellset[k * n2 * l];
         }
       }
     }
   }
+  
+
+  // for (int atom = 0; atom < natoms; atom++) {
+  //   for (int i = 0; i < nbasis; i++) {
+  //     for (int j = 0; j < nbasis; j++) {
+  //       int nprimitives_i = mol[i].size();
+  //       int nprimitives_j = mol[j].size();
+
+  //       for (int k = 0; k < nprimitives_i; k++) {
+  //         for (int l = 0; l < nprimitives_j; l++) {
+
+  //           auto N = mol[i][k].A * mol[j][l].A;
+  //           auto cacb = mol[i][k].coeff * mol[j][l].coeff;
+
+  //           auto p = mol[i][k].alpha + mol[j][l].alpha;
+  //           auto P = mol[i][k].alpha * mol[i].coords +
+  //                    mol[j][l].alpha * mol[j].coords;
+  //           auto Pp = P / p;
+
+  //           auto PG = P / p - coordinates[atom];
+  //           auto PG2 = dot(PG, PG);
+
+  //           auto q = mol[i][k].alpha * mol[j][l].alpha / p;
+  //           auto Q = mol[i].coords - mol[j].coords;
+  //           auto Q2 = dot(Q, Q);
+
+  //           V_ne(i,j) += N * cacb * -Z_list[atom] * (2.0 * M_PI / p) *
+  //                         std::exp(-q * Q2) * boys(p * PG2, 0);
+  //         }
+  //       }
+  //     }
+  //   }
+  // }
   return V_ne;
 }
 
