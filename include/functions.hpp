@@ -15,7 +15,7 @@ matrix2d overlap(libint2::BasisSet obs);
 matrix2d kinetic(libint2::BasisSet obs);
 matrix2d electron_nuclear_attraction(libint2::BasisSet obs, std::vector<libint2::Atom> atoms);
 
-tensor4d electron_electron_repulsion(molecule mol);
+tensor4d electron_electron_repulsion(libint2::BasisSet obs);
 double
 nuclear_nuclear_repulsion_energy(const std::vector<coord_type> &coord_list,
                                  const std::vector<int> &Z_list);

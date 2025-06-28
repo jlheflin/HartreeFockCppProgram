@@ -53,7 +53,7 @@ int main() {
     auto S = overlap(obs);
     auto T = kinetic(obs);
     auto V_ne = electron_nuclear_attraction(obs, atoms);
-    auto V_ee = electron_electron_repulsion(mol);
+    auto V_ee = electron_electron_repulsion(obs);
     auto E_NN = nuclear_nuclear_repulsion_energy(mol.coord_list, mol.Z_list);
     auto molecular_terms = std::make_tuple(S, T, V_ne, V_ee);
     auto scf_parameters = std::make_tuple(1e-5, 20);
@@ -64,10 +64,10 @@ int main() {
   std::cout << S << "\n" << std::endl;
   std::cout << "Kinetic Matrix:\n";
   std::cout << T << "\n" << std::endl;
-  // std::cout << "V_ne Matrix:\n";
-  // std::cout << V_ne << std::endl;
-  // std::cout << "V_ee Matrix:\n";
-  // std::cout << V_ee << std::endl;
+  std::cout << "V_ne Matrix:\n";
+  std::cout << V_ne << "\n" << std::endl;
+  std::cout << "V_ee Matrix:\n";
+  std::cout << V_ee << "\n" << std::endl;
   // std::cout << "E_NN Value: " << E_NN << std::endl;
   // std::cout << "Electronic energy: " << electronic_energy << std::endl;
   std::cout << std::setprecision(17) << "Basis: " << filename << "\nTotal energy: " << total_energy << "\n"
