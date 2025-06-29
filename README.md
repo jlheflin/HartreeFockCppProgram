@@ -37,7 +37,13 @@ The screening option was needed due to a bug in the indexing of the one-electron
 I can tell this has been fixed.
 
 The code is not memory friendly, I ran the cc-pVQZ basis set on H2 and saw that the memory usage was ~8GB so be
-careful on how big of a basis set you use. 
+careful on how big of a basis set you use.
+
+I have also added in the DIIS algorithm (I will not lie, completely copied from ChatGPT. You'll find the
+`struct` called `DIISManager` in the `scf.cpp` file.) Does work though when compared with NWChem. The
+expected outcomes of using DIIS is less iterations taken to converge the SCF, and making the convergence
+process smoother. I highly suggest you try out a larger basis set (6-31g, 6-311gss) with H2O and `-d true` vs
+`-d false` to see the difference.
 
 ## Build Instructions
 
@@ -79,13 +85,20 @@ Run the program:
 
 Available options:
 ```bash
-./build/program -h
+❯ ./build/program -h                                            
 Hartree Fock Toy Code
 Usage:
   program [OPTION...]
 
-  -l, --log-level arg  Set logging level [debug, info] (default: info)
-  -h, --help           Print usage
+  -l, --log-level arg       Set logging level [debug, info] (default: info)
+  -f, --xyz-file arg        XYZ File to use (default: h2.xyz)
+  -b, --basis arg           basis set to use (default: sto-3g)
+  -c, --charge arg          charge of system (default: 0)
+  -i, --max-iterations arg  Max number of SCF iterations (default: 20)
+  -t, --tolerance arg       Tolerance for dE during SCF (default: 1e-6)
+  -d, --diis arg            Whether DIIS is enabled or not [true, false] 
+                            (default: true)
+  -h, --help                Print usage
 ```
 
 ### Nix Build
@@ -113,7 +126,7 @@ nix run
 
 If you want to use `nix run` with the available command line arguments, here is how:
 ```bash
-nix run . -- [-h, --help, -l [debug, info], --log-level [debug, info]]
+nix run . -- [-h, --help, -l [debug, info], --log-level [debug, info], etc.]
 # Example: nix run . -- --log-level debug
 ```
 
@@ -122,21 +135,11 @@ nix run . -- [-h, --help, -l [debug, info], --log-level [debug, info]]
 The output should be the following:
 
 ``` bash
-[2025-06-29 11:14:43.272] [ info] Basis: sto-3g
-[2025-06-29 11:14:43.275] [ info] Total energy: -1.0661086493089351
-# NWChem E:                                     -1.066108669518
-[2025-06-29 11:14:43.275] [ info] Basis: sto-6g
-[2025-06-29 11:14:43.281] [ info] Total energy: -1.0735829307648752
-# NWChem E:                                     -1.073582951298
-[2025-06-29 11:14:43.281] [ info] Basis: 3-21g
-[2025-06-29 11:14:43.286] [ info] Total energy: -1.0913860702729483
-# NWChem E:                                     -1.091386084615
-[2025-06-29 11:14:43.286] [ info] Basis: 6-31g
-[2025-06-29 11:14:43.289] [ info] Total energy: -1.0948079614680448
-# NWChem E:                                     -1.094807976031
-[2025-06-29 11:14:43.289] [ info] Basis: 6-311gss
-[2025-06-29 11:14:43.349] [ info] Total energy: -1.1015899868969445
-# NWChem E:                                     -1.101590002337
+./build/program
+[2025-06-29 16:06:38.864] [ info] Using XYZ File: h2.xyz
+[2025-06-29 16:06:38.864] [ info] Basis: sto-3g
+[2025-06-29 16:06:38.868] [ info] Total energy: -1.0661086493089351
+# NWChem Energy (default scf settings):         -1.066108669518
 ```
 
 # References
@@ -147,7 +150,4 @@ up-to-Date Resource for the Molecular Sciences Community.”</span>
 <a
 href="https://doi.org/10.1021/acs.jcim.9b00725">https://doi.org/10.1021/acs.jcim.9b00725</a>.
 
-STO-3G, STO-6G Reference: [Ref](https://www.basissetexchange.org/references/sto-6g/format/txt/?version=1&elements=1)  
-3-21G Reference: [Ref](https://www.basissetexchange.org/references/3-21g/format/txt/?version=1&elements=1)  
-6-31G Reference: [Ref](https://www.basissetexchange.org/references/6-31g/format/txt/?version=1&elements=1)  
-6-311G** Reference: [Ref](https://www.basissetexchange.org/references/6-311g**/format/txt/?version=0&elements=1)
+STO-3G Reference: [Ref](https://www.basissetexchange.org/references/sto-3g/format/txt/?version=1&elements=1)

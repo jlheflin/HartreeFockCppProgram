@@ -9,6 +9,6 @@ using matrix2d = Eigen::MatrixXd;
 double
 nuclear_nuclear_repulsion_energy(std::vector<libint2::Atom> atoms);
 
-double compute_electronic_energy_expectation_value(matrix2d dens_mat,
+std::array<double, 3> compute_electronic_energy_expectation_value(matrix2d dens_mat,
                                                    matrix2d T, matrix2d Vne,
                                                    matrix2d G);
