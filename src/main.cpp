@@ -1,10 +1,51 @@
 #include <Eigen/Eigen>
 #include <fstream>
 #include <functions.hpp>
-#include <iomanip>
+#include <spdlog/spdlog.h>
+#include <cxxopts.hpp>
 
+std::string to_string_mat(const Eigen::MatrixXd& mat) {
+  std::stringstream ss;
+  ss << mat;
+  return ss.str();
+}
+std::string to_string_ten(const Eigen::Tensor<double, 4>& ten) {
+  std::stringstream ss;
+  ss << ten;
+  return ss.str();
+}
 
-int main() {
+int main(int argc, char* argv[]) {
+  try {
+    cxxopts::Options options("program", "Hartree Fock Toy Code");
+    options.add_options()
+      ("l,log-level", "Set logging level [debug, info]", cxxopts::value<std::string>()->default_value("info"))
+      ("h,help", "Print usage");
+    auto result = options.parse(argc, argv);
+
+    if (result.count("help")) {
+      std::cout << options.help() << std::endl;
+      return 0;
+    }
+
+    std::string log_level = result["log-level"].as<std::string>();
+    if (log_level != "debug" && log_level != "info") {
+      spdlog::error("Unknown logging level: {}", log_level);
+      return 1;
+    }
+
+    if (log_level == "debug") {
+      spdlog::set_level(spdlog::level::debug);
+    } else {
+      spdlog::set_level(spdlog::level::info);
+    }
+  } catch (const cxxopts::exceptions::exception& e) {
+      spdlog::error("Error parsing options: {}", e.what());
+      return 1;
+  }
+  
+  spdlog::set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%^%5l%$] %v");
+
   libint2::initialize();
 
   std::vector<std::string> basis_sets;
@@ -21,30 +62,25 @@ int main() {
   std::vector<libint2::Atom> atoms = libint2::read_dotxyz(xyz);
 
   for (std::string basis : basis_sets) {
+    spdlog::info("Basis: {}", basis);
     libint2::BasisSet obs(basis, atoms);
-    // obs.set_pure(false);
-    auto S = overlap(obs); 
-    // std::cout << "Overlap Matrix:\n";
-    // std::cout << S << "\n" << std::endl;
+    auto S = overlap(obs);
+    spdlog::trace("\nOverlap Matrix:\n{}", to_string_mat(S));
     auto T = kinetic(obs);
-    // std::cout << "Kinetic Matrix:\n";
-    // std::cout << T << "\n" << std::endl;
+    spdlog::trace("\nKinetic Matrix:\n{}", to_string_mat(T));
     auto V_ne = electron_nuclear_attraction(obs, atoms);
-    // std::cout << "V_ne Matrix:\n";
-    // std::cout << V_ne << "\n" << std::endl;
+    spdlog::trace("\nV_ne Matrix:\n{}", to_string_mat(V_ne));
     auto V_ee = electron_electron_repulsion(obs);
-    // std::cout << "V_ee Matrix:\n";
-    // std::cout << V_ee << "\n" << std::endl;
+    spdlog::trace("\nV_ee Matrix:\n{}", to_string_ten(V_ee));
     auto E_NN = nuclear_nuclear_repulsion_energy(atoms);
-    // std::cout << "E_NN Value: " << E_NN << std::endl;
+    spdlog::debug("E_nn Value: {}", E_NN);
     auto molecular_terms = std::make_tuple(S, T, V_ne, V_ee);
     auto scf_parameters = std::make_tuple(1e-8, 50);
     auto electronic_energy = scf_cycle(molecular_terms, scf_parameters, obs, atoms);
-    // std::cout << "Electronic energy: " << electronic_energy << std::endl;
+    spdlog::debug("Electronic Energy: {}", electronic_energy);
     auto total_energy = electronic_energy + E_NN;
 
-    std::cout << std::setprecision(17) << "Basis: " << basis << "\nTotal energy: " << total_energy << "\n"
-              << std::endl;
+    spdlog::info("Total energy: {:.16f}", total_energy);
   }
   libint2::finalize();
   return 0;
