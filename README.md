@@ -13,7 +13,7 @@ concepts of the Hartree Fock equation. It is in no way performant. All I have re
 that the values I am getting for the energies make sense when compared to the values from
 [NWChem](https://github.com/nwchemgit/nwchem) for the same H2 system and basis set.
 
-Currently the code is set up with the STO-3G, STO-6G, 3-21G, 6-31G, and 6-311G** basis set for Hydrogen,
+Currently the code is set up to use the STO-3G, STO-6G, 3-21G, 6-31G, and 6-311G** basis sets,
 based on the values available from the Libint library. Whatever basis sets are available in Libint are
 available for use in this code.
 
@@ -35,6 +35,9 @@ it needs to be added.~~
 
 The screening option was needed due to a bug in the indexing of the one-electron integrals in my code. As far as
 I can tell this has been fixed.
+
+The code is not memory friendly, I ran the cc-pVQZ basis set on H2 and saw that the memory usage was ~8GB so be
+careful on how big of a basis set you use. 
 
 ## Build Instructions
 
@@ -146,4 +149,4 @@ href="https://doi.org/10.1021/acs.jcim.9b00725">https://doi.org/10.1021/acs.jcim
 STO-3G, STO-6G Reference: [Ref](https://www.basissetexchange.org/references/sto-6g/format/txt/?version=1&elements=1)  
 3-21G Reference: [Ref](https://www.basissetexchange.org/references/3-21g/format/txt/?version=1&elements=1)  
 6-31G Reference: [Ref](https://www.basissetexchange.org/references/6-31g/format/txt/?version=1&elements=1)  
-6-311G Reference: [Ref](https://www.basissetexchange.org/references/6-311g/format/txt/?version=0&elements=1)
+6-311G** Reference: [Ref](https://www.basissetexchange.org/references/6-311g**/format/txt/?version=0&elements=1)
