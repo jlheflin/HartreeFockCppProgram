@@ -23,7 +23,7 @@ nuclear_nuclear_repulsion_energy(std::vector<libint2::Atom> atoms) {
   return E_NN;
 }
 
-double compute_electronic_energy_expectation_value(matrix2d dens_mat,
+std::array<double, 3> compute_electronic_energy_expectation_value(matrix2d dens_mat,
                                                    matrix2d T, matrix2d Vne,
                                                    matrix2d G) {
 
@@ -40,5 +40,5 @@ double compute_electronic_energy_expectation_value(matrix2d dens_mat,
       electronic_energy += dens_mat(i,j) * (Hcore(i,j) + 0.5 * G(i,j));
     }
   }
-  return electronic_energy;
+  return {electronic_energy, E_one, E_two};
 }
