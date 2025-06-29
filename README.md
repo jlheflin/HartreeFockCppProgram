@@ -10,8 +10,8 @@ library under the hood, so it is necessary to install Libint to be used.
 
 This is more of a testing "toy" code, for me to learn how to use certain libraries as well as learn the
 concepts of the Hartree Fock equation. It is in no way performant. All I have really done is made sure
-that the values I am getting for the energies make sense when compared to the values from [NWChem](https://github.com/nwchemgit/nwchem) for
-the same H2 system and basis set.
+that the values I am getting for the energies make sense when compared to the values from
+[NWChem](https://github.com/nwchemgit/nwchem) for the same H2 system and basis set.
 
 Currently the code is set up with the STO-3G, STO-6G, 3-21G, 6-31G, and 6-311G** basis set for Hydrogen,
 based on the values available from the Libint library. Whatever basis sets are available in Libint are
@@ -46,6 +46,8 @@ Dependencies:
 - Eigen
 - Boost
 - Libint
+- spdlog
+- cxxopts
 
 I recently used this repo to learn how to use vcpkg, so there is now a
 `vcpkg.json` manifest available. I was able to install the Eigen package
@@ -82,6 +84,16 @@ Run the program:
 ./build/program
 ```
 
+Available options:
+```bash
+Hartree Fock Toy Code
+Usage:
+  program [OPTION...]
+
+  -l, --log-level arg  Set logging level [debug, info] (default: info)
+  -h, --help           Print usage
+```
+
 ### Nix Build
 
 I recently added a flake.nix to this repo to test out how to use Nix
@@ -105,32 +117,32 @@ cd ./HartreeFockCppProgram
 nix run
 ```
 
+If you want to use `nix run` with the available command line arguments, here is how:
+```bash
+nix run . -- [-h, --help, -l [debug, info], --log-level [debug, info]]
+# Example: nix run . -- --log-level debug
+```
+
 ## Build Result
 
 The output should be the following:
 
 ``` bash
-Basis: sto-3g
-Total energy: -1.0661086493089351
-# NWChem E:   -1.066108669518
-
-Basis: sto-6g
-Total energy: -1.0735829307648752
-# NWChem E:   -1.073582951298
-
-Basis: 3-21g
-Total energy: -1.0913860702729483
-# NWChem E:   -1.091386084615
-
-
-Basis: 6-31g
-Total energy: -1.0948079614680448
-# NWChem E:   -1.094807976031
-
-
-Basis: 6-311gss
-Total energy: -1.1015899868969445
-# NWChem E:   -1.101590002337
+[2025-06-29 11:14:43.272] [ info] Basis: sto-3g
+[2025-06-29 11:14:43.275] [ info] Total energy: -1.0661086493089351
+# NWChem E:                                     -1.066108669518
+[2025-06-29 11:14:43.275] [ info] Basis: sto-6g
+[2025-06-29 11:14:43.281] [ info] Total energy: -1.0735829307648752
+# NWChem E:                                     -1.073582951298
+[2025-06-29 11:14:43.281] [ info] Basis: 3-21g
+[2025-06-29 11:14:43.286] [ info] Total energy: -1.0913860702729483
+# NWChem E:                                     -1.091386084615
+[2025-06-29 11:14:43.286] [ info] Basis: 6-31g
+[2025-06-29 11:14:43.289] [ info] Total energy: -1.0948079614680448
+# NWChem E:                                     -1.094807976031
+[2025-06-29 11:14:43.289] [ info] Basis: 6-311gss
+[2025-06-29 11:14:43.349] [ info] Total energy: -1.1015899868969445
+# NWChem E:                                     -1.101590002337
 ```
 
 # References
