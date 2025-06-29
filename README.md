@@ -10,7 +10,7 @@ library under the hood, so it is necessary to install Libint to be used.
 
 This is more of a testing "toy" code, for me to learn how to use certain libraries as well as learn the
 concepts of the Hartree Fock equation. It is in no way performant. All I have really done is made sure
-that the values I am getting for the energies make sense when compared to the values from NWChem for
+that the values I am getting for the energies make sense when compared to the values from [NWChem](https://github.com/nwchemgit/nwchem) for
 the same H2 system and basis set.
 
 Currently the code is set up with the STO-3G, STO-6G, 3-21G, 6-31G, and 6-311G** basis set for Hydrogen,
