@@ -21,7 +21,6 @@ find_package(nlohmann_json CONFIG REQUIRED)
 find_package(Libint2 REQUIRED)
 set(SOURCES
     src/main.cpp
-    src/classes.cpp
     src/functions.cpp
 )
 

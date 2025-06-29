@@ -1,12 +1,9 @@
 #pragma once
-#include <classes.hpp>
 #include <unsupported/Eigen/CXX11//Tensor>
-#include <nlohmann/json.hpp>
 #include <libint2.hpp>
 
 using tensor4d = Eigen::Tensor<double, 4>;
 using matrix2d = Eigen::MatrixXd;
-using json = nlohmann::json;
 
 int test();
 
@@ -30,4 +27,3 @@ double
 scf_cycle(std::tuple<matrix2d, matrix2d, matrix2d, tensor4d> molecular_terms,
           std::tuple<double, int> scf_parameters, libint2::BasisSet obs, std::vector<libint2::Atom> atoms, int charge = 0);
 
-std::vector<atomic_orbital> ao_basis_from_file(json& basis_data, std::vector<coord_type>& coords);
