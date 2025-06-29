@@ -17,11 +17,6 @@ Currently the code is set up with the STO-3G, STO-6G, 3-21G, 6-31G, and 6-311G**
 based on the values available from the Libint library. Whatever basis sets are available in Libint are
 available for use in this code.
 
-STO-3G, STO-6G Reference: [Ref](https://www.basissetexchange.org/references/sto-6g/format/txt/?version=1&elements=1)  
-3-21G Reference: [Ref](https://www.basissetexchange.org/references/3-21g/format/txt/?version=1&elements=1)  
-6-31G Reference: [Ref](https://www.basissetexchange.org/references/6-31g/format/txt/?version=1&elements=1)  
-6-311G Reference: [Ref](https://www.basissetexchange.org/references/6-311g/format/txt/?version=0&elements=1)
-
 ## Important Notes
 Most of this code is "vibe" coded, meaning that I utilized ChatGPT to help understand logic,
 process, and diagnose the code as I wrote it. While the non-Libint implementation of the code
@@ -147,3 +142,8 @@ up-to-Date Resource for the Molecular Sciences Community.”</span>
 <em>Journal of Chemical Information and Modeling</em> 59 (11): 4814–20.
 <a
 href="https://doi.org/10.1021/acs.jcim.9b00725">https://doi.org/10.1021/acs.jcim.9b00725</a>.
+
+STO-3G, STO-6G Reference: [Ref](https://www.basissetexchange.org/references/sto-6g/format/txt/?version=1&elements=1)  
+3-21G Reference: [Ref](https://www.basissetexchange.org/references/3-21g/format/txt/?version=1&elements=1)  
+6-31G Reference: [Ref](https://www.basissetexchange.org/references/6-31g/format/txt/?version=1&elements=1)  
+6-311G Reference: [Ref](https://www.basissetexchange.org/references/6-311g/format/txt/?version=0&elements=1)
