@@ -79,6 +79,7 @@ Run the program:
 
 Available options:
 ```bash
+./build/program -h
 Hartree Fock Toy Code
 Usage:
   program [OPTION...]
