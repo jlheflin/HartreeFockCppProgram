@@ -1,4 +1,3 @@
-#pragma once
 #include <integrals.hpp>
 
 using tensor4d = Eigen::Tensor<double, 4>;

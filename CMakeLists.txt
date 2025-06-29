@@ -18,6 +18,14 @@ find_package(Libint2 CONFIG REQUIRED)
 if(Libint2_FOUND)
     message(STATUS "Libint2 found!")
 endif()
+find_package(spdlog CONFIG REQUIRED)
+if(spdlog_FOUND)
+    message(STATUS "spdlog found!")
+endif()
+find_package(cxxopts CONFIG REQUIRED)
+if(cxxopts_FOUND)
+    message(STATUS "cxxopts found!")
+endif()
 
 file(GLOB_RECURSE src_files CONFIGURE_DEPENDS src/*.cpp)
 file(GLOB_RECURSE inc_files CONFIGURE_DEPENDS include/*.hpp)
@@ -27,6 +35,8 @@ target_include_directories(program PRIVATE include)
 target_link_libraries(program PRIVATE
     Eigen3::Eigen
     Libint2::cxx
+    spdlog::spdlog
+    cxxopts::cxxopts
 )
 
 install(TARGETS program
