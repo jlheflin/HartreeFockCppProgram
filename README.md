@@ -33,10 +33,13 @@ important concerns). With that in mind, I have made this version of the code GPL
 
 (Not quite up to speed on licensing so if there are any problems please make and issue and get me up to speed!)
 
-Additionally, the code uses a "screening" tool within the `scf_cycle` function within `functions.cpp`. This is
+~~Additionally, the code uses a "screening" tool within the `scf_cycle` function within `functions.cpp`. This is
 the only way I could get basis sets with l > 0 to successfully run. The impact on adding this code (and why it
 is necessary) is beyond my grasp at the moment, so I will come back and update this when I know for sure why
-it needs to be added.
+it needs to be added.~~
+
+The screening option was needed due to a bug in the indexing of the one-electron integrals in my code. As far as
+I can tell this has been fixed.
 
 ## Build Instructions
 
