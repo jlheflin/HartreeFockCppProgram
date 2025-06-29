@@ -19,7 +19,7 @@ int main(int argc, char* argv[]) {
   try {
     cxxopts::Options options("program", "Hartree Fock Toy Code");
     options.add_options()
-      ("l,log-level", "Set logging level", cxxopts::value<std::string>()->default_value("info"))
+      ("l,log-level", "Set logging level [debug, info]", cxxopts::value<std::string>()->default_value("info"))
       ("h,help", "Print usage");
     auto result = options.parse(argc, argv);
 
@@ -29,6 +29,11 @@ int main(int argc, char* argv[]) {
     }
 
     std::string log_level = result["log-level"].as<std::string>();
+    if (log_level != "debug" && log_level != "info") {
+      spdlog::error("Unknown logging level: {}", log_level);
+      return 1;
+    }
+
     if (log_level == "debug") {
       spdlog::set_level(spdlog::level::debug);
     } else {
