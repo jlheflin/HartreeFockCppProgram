@@ -8,10 +8,17 @@
 int main() {
   libint2::initialize();
 
-  std::vector<std::string> basis_sets = {"sto-3g", "sto-6g", "3-21g", "6-31g", "6-311gss"};
+  std::vector<std::string> basis_sets;
+  basis_sets.push_back("sto-3g");
+  basis_sets.push_back("sto-6g");
+  basis_sets.push_back("3-21g");
+  basis_sets.push_back("6-31g");
+  basis_sets.push_back("6-311gss");
+  // basis_sets.push_back("cc-pvqz");
+  // basis_sets.push_back("cc-pv6z");
 
 
-  std::ifstream xyz("h2o.xyz");
+  std::ifstream xyz("h2.xyz");
   std::vector<libint2::Atom> atoms = libint2::read_dotxyz(xyz);
 
   for (std::string basis : basis_sets) {
@@ -32,7 +39,7 @@ int main() {
     auto E_NN = nuclear_nuclear_repulsion_energy(atoms);
     // std::cout << "E_NN Value: " << E_NN << std::endl;
     auto molecular_terms = std::make_tuple(S, T, V_ne, V_ee);
-    auto scf_parameters = std::make_tuple(1e-5, 200);
+    auto scf_parameters = std::make_tuple(1e-8, 50);
     auto electronic_energy = scf_cycle(molecular_terms, scf_parameters, obs, atoms);
     // std::cout << "Electronic energy: " << electronic_energy << std::endl;
     auto total_energy = electronic_energy + E_NN;

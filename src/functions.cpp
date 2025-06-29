@@ -310,12 +310,12 @@ scf_cycle(std::tuple<matrix2d, matrix2d, matrix2d, tensor4d> molecular_terms,
     double eps = 1e-12;
 
     for (int i = 0; i < evals.size(); i++) {
-      if (evals[i] < eps) {
-        // std::cerr << "Warning: overlap eigenvalue " << i << " = " << evals[i] << " < " << " (basis nearly linearly dependent)\n";
-        evals[i] = 0.0;
-      } else {
+      // if (evals[i] < eps) {
+      //   // std::cerr << "Warning: overlap eigenvalue " << i << " = " << evals[i] << " < " << " (basis nearly linearly dependent)\n";
+      //   evals[i] = 0.0;
+      // } else {
         evals[i] = 1.0 / std::sqrt(evals[i]);
-      }
+      // }
     }
     matrix2d S_inv_sqrt = evecs * evals.asDiagonal() * evecs.transpose();
 
