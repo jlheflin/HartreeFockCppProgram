@@ -56,7 +56,7 @@ matrix2d overlap(libint2::BasisSet obs) {
 
       for (int k = 0; k < n1; k++) {
         for (int l = 0; l < n2; l++) {
-          S(bf1 + k, bf2 + l) += ints_shellset[k * n2 * l];
+          S(bf1 + k, bf2 + l) += ints_shellset[k * n2 + l];
           // std::cout << "S(" << bf1+k << "," << bf2+l << "): " << ints_shellset[k * n2 * l] << std::endl;
         }
       }
@@ -88,7 +88,7 @@ matrix2d kinetic(libint2::BasisSet obs) {
 
       for (int k = 0; k < n1; k++) {
         for (int l = 0; l < n2; l++) {
-          T(bf1 + k, bf2 + k) += ints_shellset[k * n2 * l];
+          T(bf1 + k, bf2 + l) += ints_shellset[k * n2 + l];
         }
       }
     }
@@ -125,7 +125,7 @@ matrix2d electron_nuclear_attraction(libint2::BasisSet obs, std::vector<libint2:
 
       for (int k = 0; k < n1; k++) {
         for (int l = 0; l < n2; l++) {
-          V_ne(bf1 + k, bf2 + l) += ints_shellset[k * n2 * l];
+          V_ne(bf1 + k, bf2 + l) += ints_shellset[k * n2 + l];
         }
       }
     }
@@ -161,11 +161,6 @@ tensor4d electron_electron_repulsion(libint2::BasisSet obs) {
           auto ints_shellset = buf_vec[0];
           if (ints_shellset == nullptr)
             continue;
-
-          int nprimitives_i = obs.size();
-          int nprimitives_j = obs.size();
-          int nprimitives_k = obs.size();
-          int nprimitives_l = obs.size();
 
           for (int ii = 0; ii < n1; ii++) {
             for (int jj = 0; jj < n2; jj++) {
@@ -258,37 +253,46 @@ double compute_electronic_energy_expectation_value(matrix2d dens_mat,
 
   auto Hcore = T + Vne;
   auto electronic_energy = 0.0;
+  double E_one = 0.0;
+  double E_two = 0.0;
   auto nbasis_functions = dens_mat.rows();
 
   for (int i = 0; i < nbasis_functions; i++) {
     for (int j = 0; j < nbasis_functions; j++) {
+      E_one += dens_mat(i,j) * Hcore(i,j);
+      E_two += dens_mat(i,j) * 0.5 * G(i,j);
       electronic_energy += dens_mat(i,j) * (Hcore(i,j) + 0.5 * G(i,j));
     }
   }
+  // std::cout << "One-electron energy: " << E_one << std::endl;
+  // std::cout << "Two-electron energy: " << E_two << std::endl;
   return electronic_energy;
 }
 
 double
 scf_cycle(std::tuple<matrix2d, matrix2d, matrix2d, tensor4d> molecular_terms,
-          std::tuple<double, int> scf_parameters, libint2::BasisSet obs) {
+          std::tuple<double, int> scf_parameters, libint2::BasisSet obs, std::vector<libint2::Atom> atoms, int charge) {
   auto [S, T, Vne, Vee] = molecular_terms;
   auto [tolerance, max_iter] = scf_parameters;
   auto electronic_energy = 0.0;
 
   int nbasis_functions = obs.nbf();
-
   matrix2d dens_mat(nbasis_functions, nbasis_functions);
   dens_mat.setZero();
+
+  int electrons = 0;
+  for (const auto& atom : atoms) {
+    electrons += atom.atomic_number;
+  }
+  electrons -= charge;
+  int n_occ = electrons / 2;
+  // std::cout << "Total Electrons: " << electrons << std::endl;
+  // std::cout << "Occupied orbitals: " << n_occ << std::endl;
 
   for (int scf_step = 0; scf_step < max_iter; scf_step++) {
     auto electronic_energy_old = electronic_energy;
     auto G = compute_G(dens_mat, Vee);
     auto F = T + Vne + G;
-
-    // auto S_eigen = S;
-    // auto S_eigen_inv = S_eigen.inverse();
-    // auto S_eigen_inv_sqrt = S_eigen_inv.sqrt();
-    // auto S_inv_sqrt = S_eigen_inv_sqrt;
 
     Eigen::SelfAdjointEigenSolver<matrix2d> es(S);
     if (es.info() != Eigen::Success) {
@@ -306,12 +310,12 @@ scf_cycle(std::tuple<matrix2d, matrix2d, matrix2d, tensor4d> molecular_terms,
     double eps = 1e-12;
 
     for (int i = 0; i < evals.size(); i++) {
-      if (evals[i] < eps) {
-        // std::cerr << "Warning: overlap eigenvalue " << i << " = " << evals[i] << " < " << " (basis nearly linearly dependent)\n";
-        evals[i] = 0.0;
-      } else {
+      // if (evals[i] < eps) {
+      //   // std::cerr << "Warning: overlap eigenvalue " << i << " = " << evals[i] << " < " << " (basis nearly linearly dependent)\n";
+      //   evals[i] = 0.0;
+      // } else {
         evals[i] = 1.0 / std::sqrt(evals[i]);
-      }
+      // }
     }
     matrix2d S_inv_sqrt = evecs * evals.asDiagonal() * evecs.transpose();
 
@@ -329,7 +333,7 @@ scf_cycle(std::tuple<matrix2d, matrix2d, matrix2d, tensor4d> molecular_terms,
 
     auto mos = S_inv_sqrt * eigenvectors;
 
-    dens_mat = compute_density_matrix(mos, 1);
+    dens_mat = compute_density_matrix(mos, n_occ);
 
     electronic_energy =
         compute_electronic_energy_expectation_value(dens_mat, T, Vne, G);
