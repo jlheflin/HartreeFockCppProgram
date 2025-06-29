@@ -4,16 +4,38 @@ This is a reimplementation of the HartreeFockPythonProgram from
 [NickelAndCopper's](https://youtube.com/playlist?list=PL-hN8vfRaU7jSFHN1ZSAMNe_2nXhwAmzM&si=ANjI8kPn-5v_3Kvs)
 YouTube Playlist (also, here is the
 [GitHub](https://github.com/nickelandcopper/HartreeFockPythonProgram)
-for the HatreeFockPythonProgram).
+for the HatreeFockPythonProgram). Additionally, this code now utilizes the [Libint](https://github.com/evaleev/libint)
+library under the hood, so it is necessary to install Libint to be used.
 
-Currently the code is set up with the STO-3G, STO-6g, 3-21G, 6-31G, and 6-311G basis set for Hydrogen,
-based on the values available from the [Basis Set
-Exhange](https://www.basissetexchange.org/basis/6-31g/format/json/?version=1&elements=1)
+This is more of a testing "toy" code, for me to learn how to use certain libraries as well as learn the
+concepts of the Hartree Fock equation. It is in no way performant. All I have really done is made sure
+that the values I am getting for the energies make sense when compared to the values from NWChem for
+the same H2 system and basis set.
+
+Currently the code is set up with the STO-3G, STO-6G, 3-21G, 6-31G, and 6-311G** basis set for Hydrogen,
+based on the values available from the Libint library. Whatever basis sets are available in Libint are
+available for use in this code.
 
 STO-3G, STO-6G Reference: [Ref](https://www.basissetexchange.org/references/sto-6g/format/txt/?version=1&elements=1)  
 3-21G Reference: [Ref](https://www.basissetexchange.org/references/3-21g/format/txt/?version=1&elements=1)  
 6-31G Reference: [Ref](https://www.basissetexchange.org/references/6-31g/format/txt/?version=1&elements=1)  
-6-311G Reference: [Ref](https://www.basissetexchange.org/references/6-311g/format/txt/?version=0&elements=1)  
+6-311G Reference: [Ref](https://www.basissetexchange.org/references/6-311g/format/txt/?version=0&elements=1)
+
+## Important Notes
+Most of this code is "vibe" coded, meaning that I utilized ChatGPT to help understand logic,
+process, and diagnose the code as I wrote it. While the non-Libint implementation of the code
+only followed the logic in NickelAndCopper's code, the current implementation of the functions
+in `functions.cpp` were less understood. I personally need to better understand the `shells2bf`
+functionality of the `libint2::BasisSet` class. ChatGPT directly suggested using the example code
+in the Libint Wiki, which is concerning for the license of this current code (as well as other more
+important concerns). With that in mind, I have made this version of the code GPL 3.0 licensed.
+
+(Not quite up to speed on licensing so if there are any problems please make and issue and get me up to speed!)
+
+Additionally, the code uses a "screening" tool within the `scf_cycle` function within `functions.cpp`. This is
+the only way I could get basis sets with l > 0 to successfully run. The impact on adding this code (and why it
+is necessary) is beyond my grasp at the moment, so I will come back and update this when I know for sure why
+it needs to be added.
 
 ## Build Instructions
 
@@ -22,7 +44,7 @@ Dependencies:
 - cmake
 - Eigen
 - Boost
-- nlohmann's JSON
+- Libint
 
 I recently used this repo to learn how to use vcpkg, so there is now a
 `vcpkg.json` manifest available. I was able to install the Eigen package
@@ -30,7 +52,7 @@ listed in `vcpkg.json` by running `vcpkg install` in the repo directory.
 There are other actions necessary for CMake and vcpkg to work together,
 so please read the vcpkg docs to ensure these steps are taken. If you
 already have Eigen installed on your system, the regular compilation
-should still work.
+should still work. NOTE: This will not install Libint.
 
 Clone the repo:
 
@@ -44,7 +66,7 @@ Configure the build:
 
 ``` bash
 cd ./HatreeFockCppProgram
-cmake -S . -B build
+cmake -S . -B build -DCMAKE_PREFIX_PATH=<path-to-libint-install>
 ```
 
 Compile the code:
@@ -87,20 +109,27 @@ nix run
 The output should be the following:
 
 ``` bash
-Basis: sto-3g.1.json
-Total energy: -1.0659994615565607
+Basis: sto-3g
+Total energy: -1.0661086493089351
+# NWChem E:   -1.066108669518
 
-Basis: sto-6g.1.json
-Total energy: -1.0758904077276754
+Basis: sto-6g
+Total energy: -1.0735829307648752
+# NWChem E:   -1.073582951298
 
-Basis: 3-21g.1.json
-Total energy: -1.0719530233452628
+Basis: 3-21g
+Total energy: -1.0913857764378958
+# NWChem E:   -1.091386084615
 
-Basis: 6-31g.1.json
-Total energy: -1.07852258199628
 
-Basis: 6-311g.0.json
-Total energy: -1.0802508129054074```
+Basis: 6-31g
+Total energy: -1.0948075845461325
+# NWChem E:   -1.094807976031
+
+Basis: 6-311gss
+Total energy: -1.1035246393226881
+# NWChem E:   -1.101590002337
+```
 
 # References
 Pritchard, Benjamin P., Doaa Altarawy, Brett Didier, Tara D. Gibson, and
