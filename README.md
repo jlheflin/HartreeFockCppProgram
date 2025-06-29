@@ -119,17 +119,17 @@ Total energy: -1.0735829307648752
 # NWChem E:   -1.073582951298
 
 Basis: 3-21g
-Total energy: -1.0913857764378958
+Total energy: -1.0913860702729483
 # NWChem E:   -1.091386084615
 
 
 Basis: 6-31g
-Total energy: -1.0948075845461325
+Total energy: -1.0948079614680448
 # NWChem E:   -1.094807976031
 
 
 Basis: 6-311gss
-Total energy: -1.1035246393226881
+Total energy: -1.1015899868969445
 # NWChem E:   -1.101590002337
 ```
 
