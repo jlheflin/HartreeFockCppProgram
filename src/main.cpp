@@ -38,7 +38,7 @@ int main(int argc, char* argv[]) {
       ("c,charge", "charge of system", cxxopts::value<int>()->default_value("0"))
       ("i,max-iterations", "Max number of SCF iterations", cxxopts::value<unsigned int>()->default_value("20"))
       ("t,tolerance", "Tolerance for dE during SCF", cxxopts::value<double>()->default_value("1e-6"))
-      ("d,diis", "Whether DIIS is enabled or not [true, false]", cxxopts::value<std::string>()->default_value("true"))
+      ("d,diis", "DIIS enabled: [true, false]", cxxopts::value<std::string>()->default_value("true"))
       ("h,help", "Print usage");
     auto result = options.parse(argc, argv);
 

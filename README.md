@@ -13,9 +13,9 @@ concepts of the Hartree Fock equation. It is in no way performant. All I have re
 that the values I am getting for the energies make sense when compared to the values from
 [NWChem](https://github.com/nwchemgit/nwchem) for the same H2 system and basis set.
 
-Currently the code is set up to use the STO-3G, STO-6G, 3-21G, 6-31G, and 6-311G** basis sets,
-based on the values available from the Libint library. Whatever basis sets are available in Libint are
-available for use in this code.
+Currently the code is set up to use the [basis sets available](https://github.com/evaleev/libint/tree/master/lib/basis)
+from the Libint library that you have installed, based on the values available from the Libint library.
+Whatever basis sets are available in Libint are available for use in this code.
 
 ## Important Notes
 Most of this code is "vibe" coded, meaning that I utilized ChatGPT to help understand logic,
@@ -42,8 +42,8 @@ careful on how big of a basis set you use.
 I have also added in the DIIS algorithm (I will not lie, completely copied from ChatGPT. You'll find the
 `struct` called `DIISManager` in the `scf.cpp` file.) Does work though when compared with NWChem. The
 expected outcomes of using DIIS is less iterations taken to converge the SCF, and making the convergence
-process smoother. I highly suggest you try out a larger basis set (6-31g, 6-311gss) with H2O and `-d true` vs
-`-d false` to see the difference.
+process smoother. I highly suggest you try out a larger basis set (6-31g, 6-311gss) with H2O and `-l debug -d true`
+vs `-l debug -d false` to see the difference.
 
 ## Build Instructions
 
@@ -96,9 +96,19 @@ Usage:
   -c, --charge arg          charge of system (default: 0)
   -i, --max-iterations arg  Max number of SCF iterations (default: 20)
   -t, --tolerance arg       Tolerance for dE during SCF (default: 1e-6)
-  -d, --diis arg            Whether DIIS is enabled or not [true, false] 
-                            (default: true)
+  -d, --diis arg            DIIS enabled: [true, false] (default: true)
   -h, --help                Print usage
+```
+
+Default run:
+```bash
+./build/program --log-level info \
+--xyz-file h2.xyz \
+--basis sto-3g \
+--charge 0 \
+--max-iterations 20 \
+--tolerance 1e-6 \
+--diis true
 ```
 
 ### Nix Build
