@@ -18,7 +18,7 @@ set(FETCHCONTENT_FULLY_DISCONNECTED OFF)
 
 find_package(Eigen3 CONFIG REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
-# find_package(cereal CONFIG REQUIRED)
+find_package(Libint2 REQUIRED)
 set(SOURCES
     src/main.cpp
     src/classes.cpp
@@ -29,7 +29,8 @@ add_executable(program ${SOURCES})
 target_include_directories(program PRIVATE include)
 target_link_libraries(program PRIVATE
     Eigen3::Eigen
-    # nlohmann_json::nlohmann_json
+    nlohmann_json::nlohmann_json
+    Libint2::cxx
     # cereal::cereal parallelzone
 )
 install(TARGETS program

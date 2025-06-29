@@ -18,7 +18,7 @@
 
           src = ./.;
           nativeBuildInputs = [ pkgs.cmake ];
-          buildInputs = [ pkgs.boost pkgs.eigen pkgs.nlohmann_json ];
+          buildInputs = [ pkgs.boost pkgs.eigen pkgs.nlohmann_json pkgs.libint ];
 
           cmakeFlags = [ "-DCMAKE_INSTALL_PREFIX=${placeholder "out"}" ];
 
@@ -39,6 +39,8 @@
               pkgs.boost
               pkgs.eigen
               pkgs.cmake
+              pkgs.nlohmann_json
+              pkgs.libint
             ];
             shellHook = ''
               echo "Welcome to dev shell!"

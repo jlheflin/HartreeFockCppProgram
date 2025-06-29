@@ -2,19 +2,22 @@
 #include <classes.hpp>
 #include <unsupported/Eigen/CXX11//Tensor>
 #include <nlohmann/json.hpp>
+#include <libint2.hpp>
 
 using tensor4d = Eigen::Tensor<double, 4>;
 using matrix2d = Eigen::MatrixXd;
 using json = nlohmann::json;
 
-matrix2d overlap(molecule mol);
-matrix2d kinetic(molecule mol);
-matrix2d electron_nuclear_attraction(molecule mol, std::vector<int> Z_list);
+int test();
 
-tensor4d electron_electron_repulsion(molecule mol);
+
+matrix2d overlap(libint2::BasisSet obs);
+matrix2d kinetic(libint2::BasisSet obs);
+matrix2d electron_nuclear_attraction(libint2::BasisSet obs, std::vector<libint2::Atom> atoms);
+
+tensor4d electron_electron_repulsion(libint2::BasisSet obs);
 double
-nuclear_nuclear_repulsion_energy(const std::vector<coord_type> &coord_list,
-                                 const std::vector<int> &Z_list);
+nuclear_nuclear_repulsion_energy(std::vector<libint2::Atom> atoms);
 matrix2d 
 compute_density_matrix(const matrix2d  &mos, int n_occ);
 
@@ -25,6 +28,6 @@ double compute_electronic_energy_expectation_value(matrix2d dens_mat,
                                                    matrix2d G);
 double
 scf_cycle(std::tuple<matrix2d, matrix2d, matrix2d, tensor4d> molecular_terms,
-          std::tuple<double, int> scf_parameters, molecule mol);
+          std::tuple<double, int> scf_parameters, libint2::BasisSet obs);
 
 std::vector<atomic_orbital> ao_basis_from_file(json& basis_data, std::vector<coord_type>& coords);
