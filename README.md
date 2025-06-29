@@ -52,14 +52,6 @@ Dependencies:
 - spdlog
 - cxxopts
 
-I recently used this repo to learn how to use vcpkg, so there is now a
-`vcpkg.json` manifest available. I was able to install the Eigen package
-listed in `vcpkg.json` by running `vcpkg install` in the repo directory.
-There are other actions necessary for CMake and vcpkg to work together,
-so please read the vcpkg docs to ensure these steps are taken. If you
-already have Eigen installed on your system, the regular compilation
-should still work. NOTE: This will not install Libint.
-
 Clone the repo:
 
 ``` bash
