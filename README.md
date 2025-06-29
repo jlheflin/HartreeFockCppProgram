@@ -7,6 +7,7 @@ YouTube Playlist (also, here is the
 for the HatreeFockPythonProgram). Additionally, this code now utilizes the [Libint](https://github.com/evaleev/libint)
 library under the hood, so it is necessary to install Libint to be used.
 
+
 This is more of a testing "toy" code, for me to learn how to use certain libraries as well as learn the
 concepts of the Hartree Fock equation. It is in no way performant. All I have really done is made sure
 that the values I am getting for the energies make sense when compared to the values from NWChem for
@@ -125,6 +126,7 @@ Total energy: -1.0913857764378958
 Basis: 6-31g
 Total energy: -1.0948075845461325
 # NWChem E:   -1.094807976031
+
 
 Basis: 6-311gss
 Total energy: -1.1035246393226881
