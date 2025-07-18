@@ -4,13 +4,13 @@
 #include <spdlog/spdlog.h>
 
 struct DIISManager {
-  std::vector<matrix2d> fock_history;
-  std::vector<matrix2d> error_history;
+  std::vector<std::shared_ptr<const matrix2d>> fock_history;
+  std::vector<std::shared_ptr<const matrix2d>> error_history;
   int max_diis = 6;
 
   void add(const matrix2d& fock, const matrix2d& error) {
-    fock_history.push_back(fock);
-    error_history.push_back(error);
+    fock_history.push_back(std::make_shared<const matrix2d>(fock));
+    error_history.push_back(std::make_shared<const matrix2d>(error));
 
     if (fock_history.size() > max_diis) {
       fock_history.erase(fock_history.begin());
@@ -26,16 +26,16 @@ struct DIISManager {
 
     for (int i = 0; i < n; i++) {
       for (int j = 0; j < n; j++) {
-        B(i, j) = (error_history[i].array() * error_history[j].array()).sum();
+        B(i, j) = (error_history[i]->array() * error_history[j]->array()).sum();
       }
       B(i, n) = B(n, i) = -1.0;
     }
 
     Eigen::VectorXd coeffs = B.fullPivLu().solve(rhs);
 
-    matrix2d fock_new = matrix2d::Zero(fock_history[0].rows(), fock_history[0].cols());
+    matrix2d fock_new = matrix2d::Zero(fock_history[0]->rows(), fock_history[0]->cols());
     for (int i = 0; i < n; i++) {
-      fock_new += coeffs(i) * fock_history[i];
+      fock_new += coeffs(i) * (*fock_history[i]);
     }
     return fock_new;
   }
@@ -44,10 +44,10 @@ struct DIISManager {
 };
 
 double
-scf_cycle(std::tuple<matrix2d, matrix2d, matrix2d, tensor4d> molecular_terms,
-          std::tuple<double, uint> scf_parameters, libint2::BasisSet obs, std::vector<libint2::Atom> atoms, int charge, bool diis_enabled) {
-  auto [S, T, Vne, Vee] = molecular_terms;
-  auto [tolerance, max_iter] = scf_parameters;
+scf_cycle(const std::tuple<matrix2d, matrix2d, matrix2d, tensor4d> &molecular_terms,
+          const std::tuple<double, uint> &scf_parameters, const libint2::BasisSet &obs, const std::vector<libint2::Atom> &atoms, int charge, bool diis_enabled) {
+  const auto& [S, T, Vne, Vee] = molecular_terms;
+  const auto& [tolerance, max_iter] = scf_parameters;
   auto electronic_energy = 0.0;
   bool converged = false;
   DIISManager diis;

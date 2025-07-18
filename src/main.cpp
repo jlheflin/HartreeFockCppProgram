@@ -9,10 +9,8 @@ std::string to_string_mat(const Eigen::MatrixXd& mat) {
   ss << mat;
   return ss.str();
 }
-std::string to_string_ten(const Eigen::Tensor<double, 4>& ten) {
-  std::stringstream ss;
-  ss << ten;
-  return ss.str();
+void to_string_ten(const Eigen::Tensor<double, 4>& ten, std::ostream& os) {
+  os << ten;
 }
 
 int main(int argc, char* argv[]) {
@@ -94,7 +92,10 @@ int main(int argc, char* argv[]) {
   auto V_ne = electron_nuclear_attraction(obs, atoms);
   spdlog::trace("\nV_ne Matrix:\n{}", to_string_mat(V_ne));
   auto V_ee = electron_electron_repulsion(obs);
-  spdlog::trace("\nV_ee Matrix:\n{}", to_string_ten(V_ee));
+  if (spdlog::default_logger()->should_log(spdlog::level::trace)) {
+    spdlog::trace("\nV_ee Matrix:\n");
+    to_string_ten(V_ee, std::cout);
+  }
   auto E_NN = nuclear_nuclear_repulsion_energy(atoms);
   auto molecular_terms = std::make_tuple(S, T, V_ne, V_ee);
   auto scf_parameters = std::make_tuple(tolerance, max_iterations);
