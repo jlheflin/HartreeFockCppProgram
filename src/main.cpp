@@ -4,11 +4,10 @@
 #include <spdlog/spdlog.h>
 #include <cxxopts.hpp>
 
-std::string to_string_mat(const Eigen::MatrixXd& mat) {
-  std::stringstream ss;
-  ss << mat;
-  return ss.str();
+void to_string_mat(const Eigen::MatrixXd& mat, std::ostream& os) {
+  os << mat;
 }
+
 void to_string_ten(const Eigen::Tensor<double, 4>& ten, std::ostream& os) {
   os << ten;
 }
@@ -78,6 +77,7 @@ int main(int argc, char* argv[]) {
 
   libint2::initialize();
   std::vector<libint2::Atom> atoms = libint2::read_dotxyz(xyz);
+  xyz.close();
 
   spdlog::info("Basis: {}", basis);
   libint2::BasisSet obs(basis, atoms);
@@ -86,18 +86,31 @@ int main(int argc, char* argv[]) {
     return 1;
   }
   auto S = overlap(obs);
-  spdlog::trace("\nOverlap Matrix:\n{}", to_string_mat(S));
+  if (spdlog::default_logger()->should_log(spdlog::level::trace)) {
+    spdlog::trace("\nOverlap Matrix:\n");
+    to_string_mat(S, std::cout);
+  }
+
   auto T = kinetic(obs);
-  spdlog::trace("\nKinetic Matrix:\n{}", to_string_mat(T));
+  if (spdlog::default_logger()->should_log(spdlog::level::trace)) {
+    spdlog::trace("\nKinetic Matrix:\n");
+    to_string_mat(T, std::cout);
+  }
+
   auto V_ne = electron_nuclear_attraction(obs, atoms);
-  spdlog::trace("\nV_ne Matrix:\n{}", to_string_mat(V_ne));
+  if (spdlog::default_logger()->should_log(spdlog::level::trace)) {
+    spdlog::trace("\nV_ne Matrix:\n");
+    to_string_mat(V_ne, std::cout);
+  }
+
   auto V_ee = electron_electron_repulsion(obs);
   if (spdlog::default_logger()->should_log(spdlog::level::trace)) {
     spdlog::trace("\nV_ee Matrix:\n");
     to_string_ten(V_ee, std::cout);
   }
+
   auto E_NN = nuclear_nuclear_repulsion_energy(atoms);
-  auto molecular_terms = std::make_tuple(S, T, V_ne, V_ee);
+  auto molecular_terms = std::tie(S, T, V_ne, V_ee);
   auto scf_parameters = std::make_tuple(tolerance, max_iterations);
   auto electronic_energy = scf_cycle(molecular_terms, scf_parameters, obs, atoms, charge, diis_enabled);
   spdlog::debug("Electronic Energy: {}", electronic_energy);

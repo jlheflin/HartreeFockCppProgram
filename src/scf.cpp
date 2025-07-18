@@ -3,6 +3,12 @@
 #include <energy.hpp>
 #include <spdlog/spdlog.h>
 
+matrix2d compute_SAD_density(const libint2::BasisSet& obs, const std::vector<libint2::Atom>& atoms) {
+  int nbf = obs.nbf();
+  matrix2d sad_density = matrix2d::Identity(nbf, nbf);
+  return sad_density;
+}
+
 struct DIISManager {
   std::vector<std::shared_ptr<const matrix2d>> fock_history;
   std::vector<std::shared_ptr<const matrix2d>> error_history;
@@ -55,7 +61,7 @@ scf_cycle(const std::tuple<matrix2d, matrix2d, matrix2d, tensor4d> &molecular_te
   int nbasis_functions = obs.nbf();
   matrix2d dens_mat(nbasis_functions, nbasis_functions);
   dens_mat.setZero();
-
+  
   int electrons = 0;
   for (const auto& atom : atoms) {
     electrons += atom.atomic_number;
@@ -82,8 +88,8 @@ scf_cycle(const std::tuple<matrix2d, matrix2d, matrix2d, tensor4d> &molecular_te
     auto G = compute_G(dens_mat, Vee);
     auto F = (T + Vne + G).eval();
 
-    matrix2d err = F * dens_mat * S - S * dens_mat * F;
     if (scf_step > 0) {
+      matrix2d err = F * dens_mat * S - S * dens_mat * F;
       diis.add(F, err);
     }
 

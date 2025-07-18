@@ -4,7 +4,7 @@ using tensor4d = Eigen::Tensor<double, 4>;
 using matrix2d = Eigen::MatrixXd;
 
 
-matrix2d overlap(libint2::BasisSet obs) {
+matrix2d overlap(const libint2::BasisSet& obs) {
   auto nbasis = obs.nbf();
   matrix2d S;
   S.setZero(nbasis, nbasis);
@@ -36,7 +36,7 @@ matrix2d overlap(libint2::BasisSet obs) {
   return S;
 }
 
-matrix2d kinetic(libint2::BasisSet obs) {
+matrix2d kinetic(const libint2::BasisSet& obs) {
   int nbasis = obs.nbf();
 
   matrix2d  T(nbasis, nbasis);
@@ -67,7 +67,7 @@ matrix2d kinetic(libint2::BasisSet obs) {
   return T;
 }
 
-matrix2d electron_nuclear_attraction(libint2::BasisSet obs, std::vector<libint2::Atom> atoms) {
+matrix2d electron_nuclear_attraction(const libint2::BasisSet& obs, const std::vector<libint2::Atom>& atoms) {
   int nbasis = obs.nbf();
   matrix2d V_ne(nbasis,nbasis);
   V_ne.setZero();
@@ -103,7 +103,7 @@ matrix2d electron_nuclear_attraction(libint2::BasisSet obs, std::vector<libint2:
   return V_ne;
 }
 
-tensor4d electron_electron_repulsion(libint2::BasisSet obs) {
+tensor4d electron_electron_repulsion(const libint2::BasisSet& obs) {
   int nbasis = obs.nbf();
 
   tensor4d V_ee(nbasis, nbasis, nbasis, nbasis);

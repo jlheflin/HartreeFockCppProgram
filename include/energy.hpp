@@ -7,8 +7,8 @@
 using matrix2d = Eigen::MatrixXd;
 
 double
-nuclear_nuclear_repulsion_energy(std::vector<libint2::Atom> atoms);
+nuclear_nuclear_repulsion_energy(const std::vector<libint2::Atom> &atoms);
 
-std::array<double, 3> compute_electronic_energy_expectation_value(matrix2d dens_mat,
-                                                   matrix2d T, matrix2d Vne,
-                                                   matrix2d G);
+std::array<double, 3> compute_electronic_energy_expectation_value(const matrix2d &dens_mat,
+                                                   const matrix2d &T, const matrix2d &Vne,
+                                                   const matrix2d &G);
